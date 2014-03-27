@@ -21,24 +21,49 @@
 
 import sys, os, inspect
 
-# add module folder
-cmd_folder = os.path.realpath(os.path.abspath(
+# get the current folder
+current_folder = os.path.realpath(os.path.abspath(
         os.path.split(inspect.getfile(
                 inspect.currentframe()))[0]))
-if cmd_folder not in sys.path:
-    sys.path.insert(0, cmd_folder)
-# include modules from a subforder
-cmd_subfolder = os.path.realpath(os.path.abspath(
-        os.path.join(os.path.split(inspect.getfile(
-                    inspect.currentframe()))[0],"modules")))
-if cmd_subfolder not in sys.path:
-    sys.path.insert(0, cmd_subfolder)
+if current_folder not in sys.path:
+    sys.path.insert(0, current_folder)
 
-from gtk_win import *
 
+import sys
+try:
+    import pygtk
+    pygtk.require("2.0")
+except:
+    pass
+try:
+    import gtk
+    import gtk.glade
+except:
+    sys.exit(1)
+
+class Handler:
+    def on_appwindow_delete_event(self, *args):
+        gtk.main_quit(*args)
+
+    def onButtonPressed(self, button):
+        print("Hello World!")
+
+class gtkhex:
+    def __init__(self):
+        #Set the Glade file
+        gladefile = os.path.join(current_folder, "gtkhex.glade")
+        self.builder = gtk.Builder()
+        self.builder.add_from_file(gladefile)
+        self.builder.connect_signals(Handler())
+        #Get the Main Window, and connect the "destroy" event
+	self.window = self.builder.get_object("appwindow")
+        self.window.show_all()
+
+    def main(self):
+        gtk.main()
 
 def main(argv):
-    win = GWindow()
+    win = gtkhex()
     win.main()
 
 
