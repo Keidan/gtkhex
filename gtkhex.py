@@ -28,7 +28,6 @@ current_folder = os.path.realpath(os.path.abspath(
 if current_folder not in sys.path:
     sys.path.insert(0, current_folder)
 
-
 import sys
 try:
     import pygtk
@@ -41,53 +40,69 @@ try:
 except:
     sys.exit(1)
 
+#Define constats utils
+def constant(f):
+    def fset(self, value): raise SyntaxError
+    def fget(self): return f()
+    return property(fget, fset)
+
+class _Const(object):
+    @constant
+    def STATUSBAR_TEXT_IDX(): return 0
+
+CONST = _Const()
+
+
 class Handler:
+    def __init__(self, window):
+        self.window = window
+        self.defaultWindowTitle = self.window.get_title()
+
+
     def on_appwindow_delete_event(self, *args):
         gtk.main_quit(*args)
 
-    def update_statusbar(self, buffer, statusbar):
-        print "New event"
-	#gchar *msg;
-	#gint lines;
-	#gint words = 0;
-	#GtkTextIter iter;
-	#gtk_statusbar_pop(statusbar, 0);
-	#bool isPlain = (statusbar == GTK_STATUSBAR(pStatusbarPlain));
-	#words = gtk_text_buffer_get_char_count(buffer);
-	#gtk_text_buffer_get_end_iter(buffer, &iter);
-	#lines = gtk_text_iter_get_line(&iter);
-	#if(isPlain) {
-	#	msg = g_strdup_printf("Plain area lines : %d, words : %d", lines, words);
-	#} else
-	#	msg = g_strdup_printf("Hexa area lines : %d, words : %d", lines, words);
-	#gtk_statusbar_push(statusbar, 0, msg);
-	#g_free(msg);
-	#if(isPlain && !lock_by_file) {
-	#	gtk_clear_text(bufferHexa);
-	#	String text = computeToHexChars(buffer);
-        #	if(!text.empty()) {
-	#		gtk_append_text(pScrollbarHexa, bufferHexa, text);
-	#		text.clear();
-	#	} else gtk_clear_text(bufferHexa);
-	#}
-
-
+    def on_cursor_position_changed(self, buffer, param, sb):
+        idx = CONST.STATUSBAR_TEXT_IDX
+        # clear the statusbar
+        sb.pop(idx)
+        # get the words number
+        words = buffer.get_char_count()
+        if not words: words = 1
+        # get the current position
+        word = buffer.props.cursor_position
+        # get the current iter
+        iter = buffer.get_iter_at_mark(buffer.get_insert())
+        # get the current line
+        line = iter.get_line()
+        # get the cursor position into the current line
+        col = buffer.get_iter_at_line_offset(line, 0)
+        sb.push(idx, "Ln {0}, Col: {1}, {2}%".format(line + 1, iter.get_line_offset(), word * 100 / words))
+        # update the title
+        if buffer.get_modified():
+            self.window.set_title(self.defaultWindowTitle + "*")
+        else: self.window.set_title(self.defaultWindowTitle)
+        self.window.queue_draw()
 
 class gtkhex:
     def __init__(self):
         #Set the Glade file
-        handlers = Handler()
         gladefile = os.path.join(current_folder, "gtkhex.glade")
         self.builder = gtk.Builder()
         self.builder.add_from_file(gladefile)
-        self.builder.connect_signals(handlers)
         # get objects
 	self.window = self.builder.get_object("appwindow")
         sb = self.builder.get_object("sb")
         tv = self.builder.get_object("tv")
         buffer = tv.get_buffer()
+        # connect handlers
+        handlers = Handler(self.window)
+        self.builder.connect_signals(handlers)
+        # init
+        tv.grab_focus()
+        sb.push(0, "Ln 1, Col: 1, 100%")
         # connect the buffer with the status bar
-        buffer.connect("changed", handlers.update_statusbar, sb)
+        buffer.connect("notify::cursor-position", handlers.on_cursor_position_changed, sb)
         # Show the window
         self.window.show_all()
 
