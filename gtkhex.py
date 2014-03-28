@@ -45,22 +45,56 @@ class Handler:
     def on_appwindow_delete_event(self, *args):
         gtk.main_quit(*args)
 
-    def onButtonPressed(self, button):
-        print("Hello World!")
+    def update_statusbar(self, buffer, statusbar):
+        print "New event"
+	#gchar *msg;
+	#gint lines;
+	#gint words = 0;
+	#GtkTextIter iter;
+	#gtk_statusbar_pop(statusbar, 0);
+	#bool isPlain = (statusbar == GTK_STATUSBAR(pStatusbarPlain));
+	#words = gtk_text_buffer_get_char_count(buffer);
+	#gtk_text_buffer_get_end_iter(buffer, &iter);
+	#lines = gtk_text_iter_get_line(&iter);
+	#if(isPlain) {
+	#	msg = g_strdup_printf("Plain area lines : %d, words : %d", lines, words);
+	#} else
+	#	msg = g_strdup_printf("Hexa area lines : %d, words : %d", lines, words);
+	#gtk_statusbar_push(statusbar, 0, msg);
+	#g_free(msg);
+	#if(isPlain && !lock_by_file) {
+	#	gtk_clear_text(bufferHexa);
+	#	String text = computeToHexChars(buffer);
+        #	if(!text.empty()) {
+	#		gtk_append_text(pScrollbarHexa, bufferHexa, text);
+	#		text.clear();
+	#	} else gtk_clear_text(bufferHexa);
+	#}
+
+
 
 class gtkhex:
     def __init__(self):
         #Set the Glade file
+        handlers = Handler()
         gladefile = os.path.join(current_folder, "gtkhex.glade")
         self.builder = gtk.Builder()
         self.builder.add_from_file(gladefile)
-        self.builder.connect_signals(Handler())
-        #Get the Main Window, and connect the "destroy" event
+        self.builder.connect_signals(handlers)
+        # get objects
 	self.window = self.builder.get_object("appwindow")
+        sb = self.builder.get_object("sb")
+        tv = self.builder.get_object("tv")
+        buffer = tv.get_buffer()
+        # connect the buffer with the status bar
+        buffer.connect("changed", handlers.update_statusbar, sb)
+        # Show the window
         self.window.show_all()
 
     def main(self):
+        gtk.gdk.threads_enter()
         gtk.main()
+        gtk.gdk.threads_leave()
 
 def main(argv):
     win = gtkhex()
