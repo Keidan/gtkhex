@@ -112,6 +112,7 @@
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">False</property>
+			<signal name="activate" handler="on_new" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -122,6 +123,7 @@
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">False</property>
+			<signal name="activate" handler="on_open" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -138,6 +140,7 @@
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">False</property>
+			<signal name="activate" handler="on_save" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -149,6 +152,7 @@
                         <property name="use_underline">True</property>
                         <property name="image">isaveas</property>
                         <property name="use_stock">False</property>
+			<signal name="activate" handler="on_save_as" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -166,6 +170,7 @@
                         <property name="use_underline">True</property>
                         <property name="image">iquit</property>
                         <property name="use_stock">False</property>
+			<signal name="activate" handler="on_quit" swapped="no"/>
                       </object>
                     </child>
                   </object>
@@ -353,6 +358,7 @@
                 <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="icon_widget">inew</property>
+		<signal name="clicked" handler="on_new" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -367,6 +373,7 @@
                 <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="icon_widget">iopen</property>
+		<signal name="clicked" handler="on_open" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -381,6 +388,7 @@
                 <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="icon_widget">isave</property>
+		<signal name="clicked" handler="on_save" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
