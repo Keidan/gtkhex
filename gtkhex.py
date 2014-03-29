@@ -58,6 +58,8 @@ class _Const(object):
     @constant
     def TEXTVIEW_NAME(): return "tv"
     @constant
+    def ABOUTDIALOG_NAME(): return "about_dialog"
+    @constant
     def FINDDIALOG_NAME(): return "find_dialog"
     @constant
     def FINDENTRY_NAME(): return "find_entry"
@@ -114,6 +116,7 @@ class Handler:
         self.win = builder.get_object(CONST.WINDOW_NAME)
         self.sb = builder.get_object(CONST.STATUSBAR_NAME)
         self.tv = builder.get_object(CONST.TEXTVIEW_NAME)
+        self.dabout = builder.get_object(CONST.ABOUTDIALOG_NAME)
         self.dfind = builder.get_object(CONST.FINDDIALOG_NAME)
         self.dreplace = builder.get_object(CONST.REPLACEDIALOG_NAME)
         self.efind = builder.get_object(CONST.FINDENTRY_NAME)
@@ -184,7 +187,9 @@ class Handler:
         else:
             gtk.main_quit()
             return False
-
+    def on_about(self, button):
+        self.dabout.run()
+        self.dabout.destroy()
     # Find dialog
     def on_find_quit(self, button):
         self.dfind.hide()

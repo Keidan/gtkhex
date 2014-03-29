@@ -336,6 +336,7 @@
                         <property name="use_underline">True</property>
                         <property name="image">iabout</property>
                         <property name="use_stock">False</property>
+			<signal name="activate" handler="on_about" swapped="no"/>
                       </object>
                     </child>
                   </object>
@@ -533,6 +534,15 @@
         </child>
       </object>
     </child>
+  </object>
+
+  <object class="GtkAboutDialog" id="about_dialog">
+    <property name="destroy_with_parent">False</property>
+    <property name="name" translatable="no">GtkHex</property>
+    <property name="copyright" translatable="no">Copyright © 2014</property>
+    <property name="comments" translatable="no">GtkHex is a simple hexa editor.</property>
+    <property name="website" translatable="no">https://github.com/Keidan</property>
+    <property name="authors">Keidan</property>
   </object>
 
   <object class="GtkDialog" id="find_dialog">
