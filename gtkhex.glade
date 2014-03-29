@@ -155,6 +155,7 @@
                         <property name="use_underline">True</property>
                         <property name="image">iimicut</property>
                         <property name="use_stock">False</property>
+			<signal name="activate" handler="on_cut" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -166,6 +167,7 @@
                         <property name="use_underline">True</property>
                         <property name="image">iimicopy</property>
                         <property name="use_stock">False</property>
+			<signal name="activate" handler="on_copy" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -177,6 +179,36 @@
                         <property name="use_underline">True</property>
                         <property name="image">iimipaste</property>
                         <property name="use_stock">False</property>
+			<signal name="activate" handler="on_paste" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="imiDelete">
+                        <property name="label" translatable="yes">_Delete</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_underline">True</property>
+                        <property name="image">iimidelete</property>
+                        <property name="use_stock">False</property>
+			<signal name="activate" handler="on_delete" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparatorMenuItem" id="smi4">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="imiSelectAll">
+                        <property name="label" translatable="yes">_Select All</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_underline">True</property>
+                        <property name="use_stock">False</property>
+			<signal name="activate" handler="on_select_all" swapped="no"/>
                       </object>
                     </child>
                   </object>
@@ -219,7 +251,7 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkSeparatorMenuItem" id="smi4">
+                      <object class="GtkSeparatorMenuItem" id="smi5">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                       </object>
@@ -385,6 +417,7 @@
                 <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="icon_widget">itbcut</property>
+		<signal name="clicked" handler="on_cut" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -399,6 +432,7 @@
                 <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="icon_widget">itbcopy</property>
+		<signal name="clicked" handler="on_copy" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -413,6 +447,7 @@
                 <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="icon_widget">itbpaste</property>
+		<signal name="clicked" handler="on_paste" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>

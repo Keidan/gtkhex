@@ -51,6 +51,31 @@ class _Const(object):
     def STATUSBAR_FILE_IDX(): return 0
     @constant
     def STATUSBAR_TEXT_IDX(): return 1
+
+    @constant
+    def IMINEW_NAME(): return "imiNew"
+    @constant
+    def IMIOPEN_NAME(): return "imiOpen"
+    @constant
+    def IMISAVE_NAME(): return "imiSave"
+    @constant
+    def IMIQUIT_NAME(): return "imiQuit"
+    @constant
+    def IMIUNDO_NAME(): return "imiUndo"
+    @constant
+    def IMIREDO_NAME(): return "imiRedo"
+    @constant
+    def IMICUT_NAME(): return "imiCut"
+    @constant
+    def IMICOPY_NAME(): return "imiCopy"
+    @constant
+    def IMIPASTE_NAME(): return "imiPaste"
+    @constant
+    def IMISELECTALL_NAME(): return "imiSelectAll"
+    @constant
+    def IMIFIND_NAME(): return "imiFind"
+    @constant
+    def IMIREPLACE_NAME(): return "imiReplace"
     @constant
     def WINDOW_NAME(): return "appwindow"
     @constant
@@ -192,6 +217,29 @@ class Handler:
         else:
             gtk.main_quit()
             return False
+
+    def on_cut(self, button):
+        buff = self.tv.get_buffer()
+        buff.cut_clipboard(gtk.clipboard_get(), True)
+
+    def on_copy(self, button):
+        buff = self.tv.get_buffer()
+        buff.copy_clipboard (gtk.clipboard_get())
+
+    def on_paste(self, button):
+        buff = self.tv.get_buffer()
+        buff.paste_clipboard (gtk.clipboard_get(), None, True)
+
+    def on_delete(self, button):
+        buff = self.tv.get_buffer()
+        buff.delete_selection(False, True)
+
+    def on_select_all(self, button):
+        buff = self.tv.get_buffer()
+        match_start = buff.get_start_iter() 
+        match_end = buff.get_end_iter() 
+        buff.select_range(match_start, match_end)
+
     def on_undo(self, button):
         print "undo"
     def on_redo(self, button):
@@ -200,6 +248,7 @@ class Handler:
     def on_about(self, button):
         self.dabout.run()
         self.dabout.destroy()
+
     # Find dialog
     def on_find_quit(self, button):
         self.dfind.hide()
@@ -307,9 +356,24 @@ class gtkhex:
         tv = builder.get_object(CONST.TEXTVIEW_NAME)
         buffer = tv.get_buffer()
         # init
+        agr = gtk.AccelGroup()
+        window.add_accel_group(agr)
         tag_found = buffer.create_tag("found", background="yellow", weight=700)
         tv.grab_focus()
         sb.push(CONST.STATUSBAR_TEXT_IDX, "Ln 1, Col: 1, 100%")
+        # init accels
+        self.load_accels(agr, builder, CONST.IMIOPEN_NAME, "<Control>O")
+        self.load_accels(agr, builder, CONST.IMINEW_NAME, "<Control>N")
+        self.load_accels(agr, builder, CONST.IMISAVE_NAME, "<Control>S")
+        self.load_accels(agr, builder, CONST.IMIQUIT_NAME, "<Control>Q")
+        self.load_accels(agr, builder, CONST.IMIUNDO_NAME, "<Control>Z")
+        self.load_accels(agr, builder, CONST.IMIREDO_NAME, "<Control>Y")
+        self.load_accels(agr, builder, CONST.IMICUT_NAME, "<Control>X")
+        self.load_accels(agr, builder, CONST.IMICOPY_NAME, "<Control>C")
+        self.load_accels(agr, builder, CONST.IMIPASTE_NAME, "<Control>V")
+        self.load_accels(agr, builder, CONST.IMISELECTALL_NAME, "<Control>A")
+        self.load_accels(agr, builder, CONST.IMIFIND_NAME, "<Control>F")
+        self.load_accels(agr, builder, CONST.IMIREPLACE_NAME, "<Control>H")
         # connect handlers
         handlers = Handler(builder, tag_found)
         builder.connect_signals(handlers)
@@ -319,6 +383,11 @@ class gtkhex:
         # Show the window
         window.set_title("Untitled - " + window.get_title())
         window.show_all()
+
+    def load_accels(self, agr, builder, name, shortcut):
+        key, mod = gtk.accelerator_parse(shortcut)
+        builder.get_object(name).add_accelerator("activate", agr, key, 
+            mod, gtk.ACCEL_VISIBLE)
 
     def main(self):
         gtk.gdk.threads_enter()
