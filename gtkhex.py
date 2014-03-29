@@ -19,7 +19,7 @@
 ###################################################################################
 
 
-import sys, os, inspect
+import sys, os, inspect, string
 
 # get the current folder
 current_folder = os.path.realpath(os.path.abspath(
@@ -28,7 +28,6 @@ current_folder = os.path.realpath(os.path.abspath(
 if current_folder not in sys.path:
     sys.path.insert(0, current_folder)
 
-import sys
 try:
     import pygtk
     pygtk.require("2.0")
@@ -37,6 +36,7 @@ except:
 try:
     import gtk
     import gtk.glade
+    import pango
 except:
     sys.exit(1)
 
@@ -51,7 +51,12 @@ class _Const(object):
     def STATUSBAR_FILE_IDX(): return 0
     @constant
     def STATUSBAR_TEXT_IDX(): return 1
-
+    @constant
+    def MAX_CHAR_BY_SEGMENT(): return 8
+    @constant
+    def MAX_CHAR_BY_LINE(): return 32
+    @constant
+    def DEFAULT_FONT(): return "Courier 10"
     @constant
     def IMINEW_NAME(): return "imiNew"
     @constant
@@ -132,11 +137,32 @@ def gtk_file_chooser(title, action):
 
 # translate text data to hex representation
 def data_to_hex(content):
-    return content
-
+    li = list(content)
+    result = ""
+    i = 0
+    length = len(li)
+    for l in li:
+        result += "{0:02x} ".format(ord(l))
+        if i == CONST.MAX_CHAR_BY_LINE - 1:
+            i = 0
+            result += "\n"
+        else: i += 1
+        if not i % CONST.MAX_CHAR_BY_SEGMENT and not i == 0: result += " "
+    del li[:]  
+    return result.strip()
+def is_hex(s):
+     hex_digits = set(string.hexdigits)
+     # if s is long, then it is faster to check against a set
+     return all(c in hex_digits for c in s)
 # translate text hex to data representation
 def hex_to_data(content):
-    return content
+    li = content.split(" ")
+    result = ""
+    for l in li:
+        if l == ' ': continue
+        if not is_hex(l): return None
+        result += l.decode('hex')
+    return result
 
 class Handler:
     def __init__(self, builder, tag_found):
@@ -153,8 +179,6 @@ class Handler:
         self.tag_found = tag_found
         self.currentFile = None
         self.changed = False
-        self.undopool = []
-        self.redopool = []
 
     def on_new(self, button):
         if self.currentFile != None and self.changed:
@@ -178,31 +202,49 @@ class Handler:
             file.close()
             self.changed = False
 
+    def write_file(self, data):
+        filename = self.currentFile
+        self.changed = False
+        self.sb.pop(CONST.STATUSBAR_FILE_IDX)
+        self.sb.push(CONST.STATUSBAR_FILE_IDX, "Saved File: " + filename)
+        index = filename.replace("\\","/").rfind("/") + 1
+        title = filename[index:] + " - " + self.defaultWindowTitle
+        self.win.set_title(title)
+        self.win.queue_draw()
+        file = open(filename, "w+")
+        file.write(data)
+        file.close()
+
+    def test_data_buffer(self):
+        buffer = self.tv.get_buffer()
+        text = buffer.get_text(buffer.get_start_iter() , buffer.get_end_iter())
+        data = hex_to_data(text)
+        if data == None:
+            d = gtk.MessageDialog(self.win,
+                                  gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, 
+                                  gtk.MESSAGE_ERROR, 
+                                  gtk.BUTTONS_OK, None)
+            d.set_markup("The text entry contain one or more invalid characters.")
+            d.run()
+            d.destroy()
+            return None
+        return data
+
+
     def on_save(self, button):
-        if self.currentFile == None:
-            self.on_save_as(button)
-        else:
-            filename = self.currentFile
-            self.changed = False
-            buffer = self.tv.get_buffer()
-            self.sb.pop(CONST.STATUSBAR_FILE_IDX)
-            self.sb.push(CONST.STATUSBAR_FILE_IDX, "Saved File: " + filename)
-            index = filename.replace("\\","/").rfind("/") + 1
-            text = buffer.get_text(buffer.get_start_iter() , buffer.get_end_iter())
-            index = filename.replace("\\","/").rfind("/") + 1
-            title = filename[index:] + " - " + self.defaultWindowTitle
-            self.win.set_title(title)
-            self.win.queue_draw()
-            file = open(filename, "w+")
-            file.write(hex_to_data(text))
-            file.close()
+        data = self.test_data_buffer()
+        if data == None: return
+        if self.currentFile == None: self.on_save_as(button)
+        else: self.write_file(data)
 
     def on_save_as(self, button):
-        response, cfile =  gtk_file_chooser("Save file", gtk.FILE_CHOOSER_ACTION_SAVE)
+        data = self.test_data_buffer()
+        if data == None: return
+        response, cfile = gtk_file_chooser("Save file", gtk.FILE_CHOOSER_ACTION_SAVE)
         if response:
             self.currentFile = cfile
             # generic call
-            self.on_save(button)
+            self.write_file(data)
 
     def on_quit(self, button):
         self.on_appwindow_delete_event(None)
@@ -360,6 +402,7 @@ class gtkhex:
         window.add_accel_group(agr)
         tag_found = buffer.create_tag("found", background="yellow", weight=700)
         tv.grab_focus()
+        tv.modify_font(pango.FontDescription(CONST.DEFAULT_FONT))
         sb.push(CONST.STATUSBAR_TEXT_IDX, "Ln 1, Col: 1, 100%")
         # init accels
         self.load_accels(agr, builder, CONST.IMIOPEN_NAME, "<Control>O")
