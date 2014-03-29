@@ -125,6 +125,7 @@
                         <property name="use_underline">True</property>
                         <property name="image">iimiundo</property>
                         <property name="use_stock">False</property>
+			<signal name="activate" handler="on_undo" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -136,6 +137,7 @@
                         <property name="use_underline">True</property>
                         <property name="image">iimiredo</property>
                         <property name="use_stock">False</property>
+			<signal name="activate" handler="on_redo" swapped="no"/>
                       </object>
                     </child>
                     <child>
@@ -174,17 +176,6 @@
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
                         <property name="image">iimipaste</property>
-                        <property name="use_stock">False</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImageMenuItem" id="imiDelete">
-                        <property name="label" translatable="yes">_Delete</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="use_underline">True</property>
-                        <property name="image">iimidelete</property>
                         <property name="use_stock">False</property>
                       </object>
                     </child>
@@ -352,6 +343,7 @@
                 <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="icon_widget">itbundo</property>
+		<signal name="clicked" handler="on_undo" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -366,6 +358,7 @@
                 <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="icon_widget">itbredo</property>
+		<signal name="clicked" handler="on_redo" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -725,7 +718,7 @@
 	    	  </packing>
 	        </child>
 	        <child>
-		  <object class="GtkEntry" id="replace_replace_entry">
+		  <object class="GtkEntry" id="replace_entry">
 		    <property name="visible">True</property>
 		    <property name="can_focus">True</property>
 		    <property name="editable">True</property>

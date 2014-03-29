@@ -67,6 +67,8 @@ class _Const(object):
     def REPLACEDIALOG_NAME(): return "replace_dialog"
     @constant
     def REPLACEENTRY_NAME(): return "replace_entry"
+    @constant
+    def REPLACEFINDENTRY_NAME(): return "replace_find_entry"
 
 CONST = _Const()
 
@@ -121,10 +123,13 @@ class Handler:
         self.dreplace = builder.get_object(CONST.REPLACEDIALOG_NAME)
         self.efind = builder.get_object(CONST.FINDENTRY_NAME)
         self.ereplace = builder.get_object(CONST.REPLACEENTRY_NAME)
+        self.ereplacefine = builder.get_object(CONST.REPLACEFINDENTRY_NAME)
         self.defaultWindowTitle = self.win.get_title()
         self.tag_found = tag_found
         self.currentFile = None
         self.changed = False
+        self.undopool = []
+        self.redopool = []
 
     def on_new(self, button):
         if self.currentFile != None and self.changed:
@@ -187,6 +192,11 @@ class Handler:
         else:
             gtk.main_quit()
             return False
+    def on_undo(self, button):
+        print "undo"
+    def on_redo(self, button):
+        print "redo"
+
     def on_about(self, button):
         self.dabout.run()
         self.dabout.destroy()
@@ -197,24 +207,7 @@ class Handler:
         self.dfind.show()
     def on_find_execute(self, button):
         self.on_search_clear(None)
-        buffer = self.tv.get_buffer()
-        cursor_mark = buffer.get_insert()
-        start = buffer.get_iter_at_mark(cursor_mark)
-        if start.get_offset() == buffer.get_char_count():
-            start = buffer.get_start_iter()
-        self.search_and_mark(self.efind.get_text(), start)
-
-    #Replace dialog
-    def on_replace(self, widget):
-        self.dreplace.show()
-    def on_replace_quit(self, widget):
-        self.dreplace.hide()
-    def on_replace_execute(self, widget):
-        buffer = self.tv.get_buffer()
-        iter = buffer.get_iter_at_mark(buffer.get_mark("insert"))
-        sel_bound = buffer.get_iter_at_mark(buffer.get_mark("selection_bound"))
-        if iter == sel_bound:
-            rself.eplace_selected_text(self.ereplace.get_text(), iter, sel_bound)
+        self.find_and_select(self.efind, True, self.dfind)
 
     def on_search_clear(self, button):
         buffer = self.tv.get_buffer()
@@ -222,22 +215,45 @@ class Handler:
         end = buffer.get_end_iter()
         buffer.remove_all_tags(start, end)
 
-    def search_and_mark(self, text, start):
+    def find_and_select(self, find, tags, parent):
+        text = find.get_text()
         buffer = self.tv.get_buffer()
-        end = buffer.get_end_iter()
-        match = start.forward_search(text, 0, end)
-        if match != None:
-            match_start, match_end = match
-            buffer.apply_tag(self.tag_found, match_start, match_end)
-            self.search_and_mark(text, match_end)
+        cursor_mark = buffer.get_insert()
+        start = buffer.get_iter_at_mark(cursor_mark)
+        if start.get_offset() == buffer.get_char_count():
+            start = buffer.get_start_iter()
+        search_flags = gtk.TEXT_SEARCH_TEXT_ONLY
+        match_iters = start.forward_search(text, search_flags)
+
+        if match_iters != None:
+            next_iter = [match_iters[1], match_iters[0]]
+            self.iter_on_screen(next_iter[0], "insert")
+            buffer.move_mark(buffer.get_mark("selection_bound"), next_iter[1])
+            if tags: buffer.apply_tag(self.tag_found, next_iter[0], next_iter[1])
+            return True
         else:
-            d = gtk.MessageDialog(None,
+            d = gtk.MessageDialog(parent,
                            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, 
                            gtk.MESSAGE_INFO, 
                            gtk.BUTTONS_OK, None)
             d.set_markup("The string " + text + " has not been found.")
             d.run()
             d.destroy()
+            return False
+
+    #Replace dialog
+    def on_replace(self, widget):
+        self.dreplace.show()
+    def on_replace_quit(self, widget):
+        self.dreplace.hide()
+    def on_replace_execute(self, widget):
+        self.on_search_clear(None)
+        buffer = self.tv.get_buffer()
+        if self.find_and_select(self.ereplacefine, False, self.dreplace):
+            iter = buffer.get_iter_at_mark(buffer.get_mark("insert"))
+            sel_bound = buffer.get_iter_at_mark(buffer.get_mark("selection_bound"))
+            if not iter == sel_bound:
+                self.replace_selected_text(self.ereplace.get_text(), iter, sel_bound)
 
     def replace_selected_text(self, str, start_iter, end_iter):
         buffer = self.tv.get_buffer()
@@ -245,7 +261,12 @@ class Handler:
         buffer.delete(start_iter, end_iter)
         buffer.insert(start_iter, str)
         buffer.end_user_action
-        iter_on_screen(start_iter, "insert")
+        self.iter_on_screen(start_iter, "insert")
+
+    def iter_on_screen(self, iter, mark_str):
+        buffer = self.tv.get_buffer()
+        buffer.place_cursor(iter) 
+        self.tv.scroll_mark_onscreen(buffer.get_mark(mark_str))
 
     def on_cursor_position_changed(self, buffer, param, sb):
         idx = CONST.STATUSBAR_TEXT_IDX
