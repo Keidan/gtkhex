@@ -57,6 +57,14 @@ class _Const(object):
     def STATUSBAR_NAME(): return "sb"
     @constant
     def TEXTVIEW_NAME(): return "tv"
+    @constant
+    def FINDDIALOG_NAME(): return "find_dialog"
+    @constant
+    def FINDENTRY_NAME(): return "find_entry"
+    @constant
+    def REPLACEDIALOG_NAME(): return "replace_dialog"
+    @constant
+    def REPLACEENTRY_NAME(): return "replace_entry"
 
 CONST = _Const()
 
@@ -72,7 +80,7 @@ def gtk_confirm_box(text):
     if response == gtk.RESPONSE_YES:
         result = True
     md.destroy()
-    return result
+    return result 
 # simple file chooser box in pygtk
 def gtk_file_chooser(title, action):
     chooser = gtk.FileChooserDialog(
@@ -102,11 +110,16 @@ def hex_to_data(content):
     return content
 
 class Handler:
-    def __init__(self, builder):
+    def __init__(self, builder, tag_found):
         self.win = builder.get_object(CONST.WINDOW_NAME)
         self.sb = builder.get_object(CONST.STATUSBAR_NAME)
         self.tv = builder.get_object(CONST.TEXTVIEW_NAME)
+        self.dfind = builder.get_object(CONST.FINDDIALOG_NAME)
+        self.dreplace = builder.get_object(CONST.REPLACEDIALOG_NAME)
+        self.efind = builder.get_object(CONST.FINDENTRY_NAME)
+        self.ereplace = builder.get_object(CONST.REPLACEENTRY_NAME)
         self.defaultWindowTitle = self.win.get_title()
+        self.tag_found = tag_found
         self.currentFile = None
         self.changed = False
 
@@ -172,6 +185,63 @@ class Handler:
             gtk.main_quit()
             return False
 
+    # Find dialog
+    def on_find_quit(self, button):
+        self.dfind.hide()
+    def on_search(self, button):
+        self.dfind.show()
+    def on_find_execute(self, button):
+        self.on_search_clear(None)
+        buffer = self.tv.get_buffer()
+        cursor_mark = buffer.get_insert()
+        start = buffer.get_iter_at_mark(cursor_mark)
+        if start.get_offset() == buffer.get_char_count():
+            start = buffer.get_start_iter()
+        self.search_and_mark(self.efind.get_text(), start)
+
+    #Replace dialog
+    def on_replace(self, widget):
+        self.dreplace.show()
+    def on_replace_quit(self, widget):
+        self.dreplace.hide()
+    def on_replace_execute(self, widget):
+        buffer = self.tv.get_buffer()
+        iter = buffer.get_iter_at_mark(buffer.get_mark("insert"))
+        sel_bound = buffer.get_iter_at_mark(buffer.get_mark("selection_bound"))
+        if iter == sel_bound:
+            rself.eplace_selected_text(self.ereplace.get_text(), iter, sel_bound)
+
+    def on_search_clear(self, button):
+        buffer = self.tv.get_buffer()
+        start = buffer.get_start_iter()
+        end = buffer.get_end_iter()
+        buffer.remove_all_tags(start, end)
+
+    def search_and_mark(self, text, start):
+        buffer = self.tv.get_buffer()
+        end = buffer.get_end_iter()
+        match = start.forward_search(text, 0, end)
+        if match != None:
+            match_start, match_end = match
+            buffer.apply_tag(self.tag_found, match_start, match_end)
+            self.search_and_mark(text, match_end)
+        else:
+            d = gtk.MessageDialog(None,
+                           gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, 
+                           gtk.MESSAGE_INFO, 
+                           gtk.BUTTONS_OK, None)
+            d.set_markup("The string " + text + " has not been found.")
+            d.run()
+            d.destroy()
+
+    def replace_selected_text(self, str, start_iter, end_iter):
+        buffer = self.tv.get_buffer()
+        buffer.begin_user_action
+        buffer.delete(start_iter, end_iter)
+        buffer.insert(start_iter, str)
+        buffer.end_user_action
+        iter_on_screen(start_iter, "insert")
+
     def on_cursor_position_changed(self, buffer, param, sb):
         idx = CONST.STATUSBAR_TEXT_IDX
         # clear the statusbar
@@ -210,12 +280,14 @@ class gtkhex:
         sb = builder.get_object(CONST.STATUSBAR_NAME)
         tv = builder.get_object(CONST.TEXTVIEW_NAME)
         buffer = tv.get_buffer()
-        # connect handlers
-        handlers = Handler(builder)
-        builder.connect_signals(handlers)
         # init
+        tag_found = buffer.create_tag("found", background="yellow", weight=700)
         tv.grab_focus()
-        sb.push(0, "Ln 1, Col: 1, 100%")
+        sb.push(CONST.STATUSBAR_TEXT_IDX, "Ln 1, Col: 1, 100%")
+        # connect handlers
+        handlers = Handler(builder, tag_found)
+        builder.connect_signals(handlers)
+
         # connect the buffer with the status bar
         buffer.connect("notify::cursor-position", handlers.on_cursor_position_changed, sb)
         # Show the window
