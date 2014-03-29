@@ -2,81 +2,6 @@
 <interface>
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy project-wide -->
-  <object class="GtkImage" id="iabout">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-about</property>
-  </object>
-  <object class="GtkImage" id="iclear">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-clear</property>
-  </object>
-  <object class="GtkImage" id="icopy">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-copy</property>
-  </object>
-  <object class="GtkImage" id="icut">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-cut</property>
-  </object>
-  <object class="GtkImage" id="idelete">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-delete</property>
-  </object>
-  <object class="GtkImage" id="ifind">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-find</property>
-  </object>
-  <object class="GtkImage" id="inew">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-new</property>
-  </object>
-  <object class="GtkImage" id="iopen">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-open</property>
-  </object>
-  <object class="GtkImage" id="ipaste">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-paste</property>
-  </object>
-  <object class="GtkImage" id="iquit">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-quit</property>
-  </object>
-  <object class="GtkImage" id="iredo">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-redo</property>
-  </object>
-  <object class="GtkImage" id="ireplace">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-find-and-replace</property>
-  </object>
-  <object class="GtkImage" id="isave">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-save</property>
-  </object>
-  <object class="GtkImage" id="isaveas">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-save-as</property>
-  </object>
-  <object class="GtkImage" id="iundo">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-undo</property>
-  </object>
   <object class="GtkWindow" id="appwindow">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">GtkHex</property>
@@ -111,6 +36,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
+                        <property name="image">iiminew</property>
                         <property name="use_stock">False</property>
 			<signal name="activate" handler="on_new" swapped="no"/>
                       </object>
@@ -122,6 +48,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
+                        <property name="image">iimiopen</property>
                         <property name="use_stock">False</property>
 			<signal name="activate" handler="on_open" swapped="no"/>
                       </object>
@@ -139,6 +66,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
+                        <property name="image">iimisave</property>
                         <property name="use_stock">False</property>
 			<signal name="activate" handler="on_save" swapped="no"/>
                       </object>
@@ -150,7 +78,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
-                        <property name="image">isaveas</property>
+                        <property name="image">iimisaveas</property>
                         <property name="use_stock">False</property>
 			<signal name="activate" handler="on_save_as" swapped="no"/>
                       </object>
@@ -168,7 +96,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
-                        <property name="image">iquit</property>
+                        <property name="image">iimiquit</property>
                         <property name="use_stock">False</property>
 			<signal name="activate" handler="on_quit" swapped="no"/>
                       </object>
@@ -195,6 +123,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
+                        <property name="image">iimiundo</property>
                         <property name="use_stock">False</property>
                       </object>
                     </child>
@@ -205,6 +134,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
+                        <property name="image">iimiredo</property>
                         <property name="use_stock">False</property>
                       </object>
                     </child>
@@ -221,6 +151,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
+                        <property name="image">iimicut</property>
                         <property name="use_stock">False</property>
                       </object>
                     </child>
@@ -231,6 +162,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
+                        <property name="image">iimicopy</property>
                         <property name="use_stock">False</property>
                       </object>
                     </child>
@@ -241,6 +173,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
+                        <property name="image">iimipaste</property>
                         <property name="use_stock">False</property>
                       </object>
                     </child>
@@ -251,7 +184,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
-                        <property name="image">idelete</property>
+                        <property name="image">iimidelete</property>
                         <property name="use_stock">False</property>
                       </object>
                     </child>
@@ -277,7 +210,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
-                        <property name="image">ifind</property>
+                        <property name="image">iimifind</property>
                         <property name="use_stock">False</property>
 			<signal name="activate" handler="on_search" swapped="no"/>
                       </object>
@@ -289,7 +222,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
-                        <property name="image">ireplace</property>
+                        <property name="image">iimireplace</property>
                         <property name="use_stock">False</property>
 			<signal name="activate" handler="on_replace" swapped="no"/>
                       </object>
@@ -307,7 +240,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
-                        <property name="image">iclear</property>
+                        <property name="image">iimiclear</property>
                         <property name="use_stock">False</property>
 			<signal name="activate" handler="on_search_clear" swapped="no"/>
                       </object>
@@ -334,7 +267,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
-                        <property name="image">iabout</property>
+                        <property name="image">iimiabout</property>
                         <property name="use_stock">False</property>
 			<signal name="activate" handler="on_about" swapped="no"/>
                       </object>
@@ -361,7 +294,7 @@
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
-                <property name="icon_widget">inew</property>
+                <property name="icon_widget">itbnew</property>
 		<signal name="clicked" handler="on_new" swapped="no"/>
               </object>
               <packing>
@@ -376,7 +309,7 @@
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
-                <property name="icon_widget">iopen</property>
+                <property name="icon_widget">itbopen</property>
 		<signal name="clicked" handler="on_open" swapped="no"/>
               </object>
               <packing>
@@ -391,7 +324,7 @@
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
-                <property name="icon_widget">isave</property>
+                <property name="icon_widget">itbsave</property>
 		<signal name="clicked" handler="on_save" swapped="no"/>
               </object>
               <packing>
@@ -418,7 +351,7 @@
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
-                <property name="icon_widget">iundo</property>
+                <property name="icon_widget">itbundo</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -432,7 +365,7 @@
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
-                <property name="icon_widget">iredo</property>
+                <property name="icon_widget">itbredo</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -458,7 +391,7 @@
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
-                <property name="icon_widget">icut</property>
+                <property name="icon_widget">itbcut</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -472,7 +405,7 @@
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
-                <property name="icon_widget">icopy</property>
+                <property name="icon_widget">itbcopy</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -486,7 +419,7 @@
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
-                <property name="icon_widget">ipaste</property>
+                <property name="icon_widget">itbpaste</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -536,6 +469,7 @@
     </child>
   </object>
 
+  <!-- About box -->
   <object class="GtkAboutDialog" id="about_dialog">
     <property name="destroy_with_parent">False</property>
     <property name="name" translatable="no">GtkHex</property>
@@ -545,6 +479,7 @@
     <property name="authors">Keidan</property>
   </object>
 
+  <!-- Find box -->
   <object class="GtkDialog" id="find_dialog">
     <property name="title" translatable="yes">Find</property>
     <property name="type">GTK_WINDOW_TOPLEVEL</property>
@@ -659,6 +594,7 @@
     </child>
   </object>
    
+  <!-- Find and Replace box -->
   <object class="GtkDialog" id="replace_dialog">
     <property name="title" translatable="yes">Find and Replace</property>
     <property name="type">GTK_WINDOW_TOPLEVEL</property>
@@ -821,5 +757,124 @@
         </child>
       </object>
     </child>
+  </object>
+
+  <!-- image tool bar -->
+  <object class="GtkImage" id="itbcopy">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-copy</property>
+  </object>
+  <object class="GtkImage" id="itbcut">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-cut</property>
+  </object>
+  <object class="GtkImage" id="itbnew">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-new</property>
+  </object>
+  <object class="GtkImage" id="itbopen">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-open</property>
+  </object>
+  <object class="GtkImage" id="itbpaste">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-paste</property>
+  </object>
+  <object class="GtkImage" id="itbredo">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-redo</property>
+  </object>
+  <object class="GtkImage" id="itbsave">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-save</property>
+  </object>
+  <object class="GtkImage" id="itbundo">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-undo</property>
+  </object>
+
+  <!-- image menu item -->
+  <object class="GtkImage" id="iimiabout">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-about</property>
+  </object>
+  <object class="GtkImage" id="iimiclear">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-clear</property>
+  </object>
+  <object class="GtkImage" id="iimicopy">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-copy</property>
+  </object>
+  <object class="GtkImage" id="iimicut">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-cut</property>
+  </object>
+  <object class="GtkImage" id="iimidelete">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-delete</property>
+  </object>
+  <object class="GtkImage" id="iimifind">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-find</property>
+  </object>
+  <object class="GtkImage" id="iiminew">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-new</property>
+  </object>
+  <object class="GtkImage" id="iimiopen">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-open</property>
+  </object>
+  <object class="GtkImage" id="iimipaste">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-paste</property>
+  </object>
+  <object class="GtkImage" id="iimiquit">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-quit</property>
+  </object>
+  <object class="GtkImage" id="iimiredo">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-redo</property>
+  </object>
+  <object class="GtkImage" id="iimireplace">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-find-and-replace</property>
+  </object>
+  <object class="GtkImage" id="iimisave">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-save</property>
+  </object>
+  <object class="GtkImage" id="iimisaveas">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-save-as</property>
+  </object>
+  <object class="GtkImage" id="iimiundo">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-undo</property>
   </object>
 </interface>
