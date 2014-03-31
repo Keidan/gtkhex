@@ -283,9 +283,21 @@ class Handler:
         buff.select_range(match_start, match_end)
 
     def on_undo(self, button):
-        print "undo"
+        d = gtk.MessageDialog(self.win,
+                              gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, 
+                              gtk.MESSAGE_ERROR, 
+                              gtk.BUTTONS_OK, None)
+        d.set_markup("Action not supported!")
+        d.run()
+        d.destroy()
     def on_redo(self, button):
-        print "redo"
+        d = gtk.MessageDialog(self.win,
+                              gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, 
+                              gtk.MESSAGE_ERROR, 
+                              gtk.BUTTONS_OK, None)
+        d.set_markup("Action not supported!")
+        d.run()
+        d.destroy()
 
     def on_about(self, button):
         self.dabout.run()
