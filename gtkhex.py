@@ -19,7 +19,7 @@
 ###################################################################################
 
 
-import sys, os, inspect, string
+import sys, os, inspect, string, urlparse
 from Queue import *
 
 # get the current folder
@@ -193,6 +193,24 @@ class Handler:
         self.redopool = LifoQueue(CONST.MAX_REDO)
         self.user_action = False
 
+    def on_quit(self, button):
+        self.on_appwindow_delete_event(None)
+
+    def on_appwindow_delete_event(self, *args):
+        if self.changed:
+            text = "Do you really want to leave this program without save ?"
+            if gtk_confirm_box(text):
+                gtk.main_quit()
+                return False
+            return True
+        else:
+            gtk.main_quit()
+            return False
+
+    def on_drop(self, widget, drag_context, x, y, selection_data, info, timestamp, user_param1):
+        p = urlparse.urlparse(selection_data.get_uris()[0]).path
+        self.open_file(p)
+
     def on_new(self, button):
         if self.currentFile != None and self.changed:
             if not gtk_confirm_box("Do you want to create a new file without saving your changes?"):
@@ -208,6 +226,7 @@ class Handler:
         self.sb.pop(CONST.STATUSBAR_FILE_IDX)
         if response:
             self.open_file(cfile)
+
     def open_file(self, cfile):
         self.currentFile = cfile
         filename = self.currentFile
@@ -216,6 +235,7 @@ class Handler:
         self.tv.get_buffer().set_text(data_to_hex(file.read()))
         file.close()
         self.changed = False
+
     def write_file(self, data):
         filename = self.currentFile
         self.changed = False
@@ -259,20 +279,6 @@ class Handler:
             self.currentFile = cfile
             # generic call
             self.write_file(data)
-
-    def on_quit(self, button):
-        self.on_appwindow_delete_event(None)
-
-    def on_appwindow_delete_event(self, *args):
-        if self.changed:
-            text = "Do you really want to leave this program without save ?"
-            if gtk_confirm_box(text):
-                gtk.main_quit()
-                return False
-            return True
-        else:
-            gtk.main_quit()
-            return False
 
     def on_cut(self, button):
         buff = self.tv.get_buffer()
@@ -512,6 +518,10 @@ class gtkhex:
         buffer.connect("delete_range", self.handlers.buffer_delete_range)
         buffer.connect("begin_user_action", self.handlers.buffer_begin_user_action)
         buffer.connect("end_user_action", self.handlers.buffer_end_user_action)
+        # connect drag and drop
+        tv.drag_dest_set(gtk.DEST_DEFAULT_ALL, 
+                         [('text/uri-list', 0, 0)], gtk.gdk.ACTION_COPY); 
+        tv.connect('drag-data-received', self.handlers.on_drop, tv);
         # Show the window
         window.set_title("Untitled - " + window.get_title())
         window.show_all()
