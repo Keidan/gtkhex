@@ -20,6 +20,7 @@
 
 
 import sys, os, inspect, string
+from Queue import *
 
 # get the current folder
 current_folder = os.path.realpath(os.path.abspath(
@@ -47,6 +48,10 @@ def constant(f):
     return property(fget, fset)
 
 class _Const(object):
+    @constant
+    def MAX_REDO(): return 255
+    @constant
+    def MAX_UNDO(): return 255
     @constant
     def STATUSBAR_FILE_IDX(): return 0
     @constant
@@ -81,6 +86,10 @@ class _Const(object):
     def IMIFIND_NAME(): return "imiFind"
     @constant
     def IMIREPLACE_NAME(): return "imiReplace"
+    @constant
+    def TBUNDO_NAME(): return "tbUndo"
+    @constant
+    def TBREDO_NAME(): return "tbRedo"
     @constant
     def WINDOW_NAME(): return "appwindow"
     @constant
@@ -166,6 +175,7 @@ def hex_to_data(content):
 
 class Handler:
     def __init__(self, builder, tag_found):
+        self.builder = builder
         self.win = builder.get_object(CONST.WINDOW_NAME)
         self.sb = builder.get_object(CONST.STATUSBAR_NAME)
         self.tv = builder.get_object(CONST.TEXTVIEW_NAME)
@@ -179,6 +189,9 @@ class Handler:
         self.tag_found = tag_found
         self.currentFile = None
         self.changed = False
+        self.undopool = LifoQueue(CONST.MAX_UNDO)
+        self.redopool = LifoQueue(CONST.MAX_REDO)
+        self.user_action = False
 
     def on_new(self, button):
         if self.currentFile != None and self.changed:
@@ -282,22 +295,69 @@ class Handler:
         match_end = buff.get_end_iter() 
         buff.select_range(match_start, match_end)
 
+    # undo/redo 
+    def undo_redo_state(self):
+        if not self.undopool.qsize():
+            self.set_sensitive(CONST.IMIUNDO_NAME, False)
+            self.set_sensitive(CONST.TBUNDO_NAME, False)
+        else:
+            self.set_sensitive(CONST.IMIUNDO_NAME, True)
+            self.set_sensitive(CONST.TBUNDO_NAME, True)
+        if not self.redopool.qsize():
+            self.set_sensitive(CONST.IMIREDO_NAME, False)
+            self.set_sensitive(CONST.TBREDO_NAME, False)
+        else:
+            self.set_sensitive(CONST.IMIREDO_NAME, True)
+            self.set_sensitive(CONST.TBREDO_NAME, True)
+
+    def buffer_insert_text(self, buffer, iter, text, length):
+        if self.user_action:
+            self.undopool.put(["insert_text", iter.get_offset(), iter.get_offset() + len(text), text])
+            with self.redopool.mutex:
+                self.redopool.queue[:] = []
+
+    def buffer_delete_range(self, buffer, start_iter, end_iter):
+        if self.user_action:
+            text = buffer.get_text(start_iter, end_iter)
+            self.undopool.put(["delete_range", start_iter.get_offset(), end_iter.get_offset(), text])
+
+    def buffer_begin_user_action(self, buffer):
+        self.user_action = True
+
+    def buffer_end_user_action(self, buffer):
+        self.user_action = False
+
     def on_undo(self, button):
-        d = gtk.MessageDialog(self.win,
-                              gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, 
-                              gtk.MESSAGE_ERROR, 
-                              gtk.BUTTONS_OK, None)
-        d.set_markup("Action not supported!")
-        d.run()
-        d.destroy()
+        buffer = self.tv.get_buffer()
+        if not self.undopool.qsize(): return
+        action = self.undopool.get()
+        if action[0] == "insert_text":
+            start_iter = buffer.get_iter_at_offset(action[1])
+            end_iter = buffer.get_iter_at_offset(action[2])
+            buffer.delete(start_iter, end_iter)
+        elif action[0] == "delete_range":
+            start_iter = buffer.get_iter_at_offset(action[1])
+            buffer.insert(start_iter, action[3])
+        self.iter_on_screen(start_iter, "insert")
+        self.redopool.put(action)
+        self.undo_redo_state()
+
     def on_redo(self, button):
-        d = gtk.MessageDialog(self.win,
-                              gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, 
-                              gtk.MESSAGE_ERROR, 
-                              gtk.BUTTONS_OK, None)
-        d.set_markup("Action not supported!")
-        d.run()
-        d.destroy()
+        buffer = self.tv.get_buffer()
+        if not self.redopool.qsize(): return
+        action = self.redopool.get() 
+        if action[0] == "insert_text":
+            start_iter = buffer.get_iter_at_offset(action[1])
+            end_iter = buffer.get_iter_at_offset(action[2])
+            buffer.insert(start_iter, action[3])
+        elif action[0] == "delete_range":
+            start_iter = buffer.get_iter_at_offset(action[1])
+            end_iter = buffer.get_iter_at_offset(action[2])
+            buffer.delete(start_iter, end_iter)
+        self.iter_on_screen(start_iter, "insert")
+        self.undopool.put(action)
+        self.undo_redo_state()
+
 
     def on_about(self, button):
         self.dabout.run()
@@ -371,7 +431,14 @@ class Handler:
         buffer.place_cursor(iter) 
         self.tv.scroll_mark_onscreen(buffer.get_mark(mark_str))
 
+    def set_sensitive(self, name, state):
+        widget = self.builder.get_object(name)
+        if not widget.get_sensitive() == state:
+            widget.set_sensitive(state)
+    
+
     def on_cursor_position_changed(self, buffer, param, sb):
+        self.undo_redo_state()
         idx = CONST.STATUSBAR_TEXT_IDX
         # clear the statusbar
         sb.pop(idx)
@@ -432,9 +499,18 @@ class gtkhex:
         # connect handlers
         handlers = Handler(builder, tag_found)
         builder.connect_signals(handlers)
-
+        # init sensitive
+        handlers.set_sensitive(CONST.IMIUNDO_NAME, False)
+        handlers.set_sensitive(CONST.IMIREDO_NAME, False)
+        handlers.set_sensitive(CONST.TBUNDO_NAME, False)
+        handlers.set_sensitive(CONST.TBREDO_NAME, False)
         # connect the buffer with the status bar
         buffer.connect("notify::cursor-position", handlers.on_cursor_position_changed, sb)
+        # Add undo/redo callbacks
+        buffer.connect("insert_text", handlers.buffer_insert_text)
+        buffer.connect("delete_range", handlers.buffer_delete_range)
+        buffer.connect("begin_user_action", handlers.buffer_begin_user_action)
+        buffer.connect("end_user_action", handlers.buffer_end_user_action)
         # Show the window
         window.set_title("Untitled - " + window.get_title())
         window.show_all()
