@@ -207,14 +207,15 @@ class Handler:
         response, cfile =  gtk_file_chooser("Open a file", gtk.FILE_CHOOSER_ACTION_OPEN)
         self.sb.pop(CONST.STATUSBAR_FILE_IDX)
         if response:
-            self.currentFile = cfile
-            filename = self.currentFile
-            self.sb.push(CONST.STATUSBAR_FILE_IDX, "Opened File: " + filename)
-            file = open(filename, "r")
-            self.tv.get_buffer().set_text(data_to_hex(file.read()))
-            file.close()
-            self.changed = False
-
+            self.open_file(cfile)
+    def open_file(self, cfile):
+        self.currentFile = cfile
+        filename = self.currentFile
+        self.sb.push(CONST.STATUSBAR_FILE_IDX, "Opened File: " + filename)
+        file = open(filename, "r")
+        self.tv.get_buffer().set_text(data_to_hex(file.read()))
+        file.close()
+        self.changed = False
     def write_file(self, data):
         filename = self.currentFile
         self.changed = False
@@ -497,23 +498,26 @@ class gtkhex:
         self.load_accels(agr, builder, CONST.IMIFIND_NAME, "<Control>F")
         self.load_accels(agr, builder, CONST.IMIREPLACE_NAME, "<Control>H")
         # connect handlers
-        handlers = Handler(builder, tag_found)
-        builder.connect_signals(handlers)
+        self.handlers = Handler(builder, tag_found)
+        builder.connect_signals(self.handlers)
         # init sensitive
-        handlers.set_sensitive(CONST.IMIUNDO_NAME, False)
-        handlers.set_sensitive(CONST.IMIREDO_NAME, False)
-        handlers.set_sensitive(CONST.TBUNDO_NAME, False)
-        handlers.set_sensitive(CONST.TBREDO_NAME, False)
+        self.handlers.set_sensitive(CONST.IMIUNDO_NAME, False)
+        self.handlers.set_sensitive(CONST.IMIREDO_NAME, False)
+        self.handlers.set_sensitive(CONST.TBUNDO_NAME, False)
+        self.handlers.set_sensitive(CONST.TBREDO_NAME, False)
         # connect the buffer with the status bar
-        buffer.connect("notify::cursor-position", handlers.on_cursor_position_changed, sb)
+        buffer.connect("notify::cursor-position", self.handlers.on_cursor_position_changed, sb)
         # Add undo/redo callbacks
-        buffer.connect("insert_text", handlers.buffer_insert_text)
-        buffer.connect("delete_range", handlers.buffer_delete_range)
-        buffer.connect("begin_user_action", handlers.buffer_begin_user_action)
-        buffer.connect("end_user_action", handlers.buffer_end_user_action)
+        buffer.connect("insert_text", self.handlers.buffer_insert_text)
+        buffer.connect("delete_range", self.handlers.buffer_delete_range)
+        buffer.connect("begin_user_action", self.handlers.buffer_begin_user_action)
+        buffer.connect("end_user_action", self.handlers.buffer_end_user_action)
         # Show the window
         window.set_title("Untitled - " + window.get_title())
         window.show_all()
+
+    def loadFile(self, filename):
+        self.handlers.open_file(filename)
 
     def load_accels(self, agr, builder, name, shortcut):
         key, mod = gtk.accelerator_parse(shortcut)
@@ -527,6 +531,7 @@ class gtkhex:
 
 def main(argv):
     win = gtkhex()
+    if len(sys.argv) == 2: win.loadFile(argv[0])
     win.main()
 
 
