@@ -462,18 +462,10 @@
           </packing>
         </child>
         <child>
-          <object class="GtkScrolledWindow" id="swText">
+          <object class="GtkNotebook" id="nbFiles">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="shadow_type">in</property>
-            <child>
-              <object class="GtkTextView" id="tv">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="wrap_mode">word</property>
-              </object>
-            </child>
-          </object>
+	  </object>
           <packing>
             <property name="expand">True</property>
             <property name="fill">True</property>
