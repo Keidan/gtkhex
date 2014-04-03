@@ -42,6 +42,30 @@ class Handlers:
         self.set_sensitive(CONST.IMIREDO_NAME, False)
         self.set_sensitive(CONST.TBUNDO_NAME, False)
         self.set_sensitive(CONST.TBREDO_NAME, False)
+        self.accelGroup = None
+        # init accels
+        self.load_accels(self.builder, CONST.IMIOPEN_NAME, "<Control>O")
+        self.load_accels(self.builder, CONST.IMINEW_NAME, "<Control>N")
+        self.load_accels(self.builder, CONST.IMISAVE_NAME, "<Control>S")
+        self.load_accels(self.builder, CONST.IMIQUIT_NAME, "<Control>Q")
+        self.load_accels(self.builder, CONST.IMIUNDO_NAME, "<Control>Z")
+        self.load_accels(self.builder, CONST.IMIREDO_NAME, "<Control>Y")
+        self.load_accels(self.builder, CONST.IMICUT_NAME, "<Control>X")
+        self.load_accels(self.builder, CONST.IMICOPY_NAME, "<Control>C")
+        self.load_accels(self.builder, CONST.IMIPASTE_NAME, "<Control>V")
+        self.load_accels(self.builder, CONST.IMISELECTALL_NAME, "<Control>A")
+        self.load_accels(self.builder, CONST.IMIFIND_NAME, "<Control>F")
+        self.load_accels(self.builder, CONST.IMIREPLACE_NAME, "<Control>H")
+
+    def get_AccelGroup(self):
+        if self.accelGroup == None:
+            self.accelGroup = gtk.AccelGroup()
+        return self.accelGroup
+
+    def load_accels(self, builder, name, shortcut):
+        key, mod = gtk.accelerator_parse(shortcut)
+        builder.get_object(name).add_accelerator("activate", self.get_AccelGroup(), key, 
+            mod, gtk.ACCEL_VISIBLE)
 
     def on_quit(self, button):
         self.on_appwindow_delete_event(None)

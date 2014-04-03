@@ -45,24 +45,10 @@ class gtkhex:
         sb = builder.get_object(CONST.STATUSBAR_NAME)
         nb = builder.get_object(CONST.NOTEBOOK_NAME)
         # init
-        agr = gtk.AccelGroup()
-        window.add_accel_group(agr)
         sb.push(CONST.STATUSBAR_TEXT_IDX, "Ln 1, Col: 1, 100%")
-        # init accels
-        self.load_accels(agr, builder, CONST.IMIOPEN_NAME, "<Control>O")
-        self.load_accels(agr, builder, CONST.IMINEW_NAME, "<Control>N")
-        self.load_accels(agr, builder, CONST.IMISAVE_NAME, "<Control>S")
-        self.load_accels(agr, builder, CONST.IMIQUIT_NAME, "<Control>Q")
-        self.load_accels(agr, builder, CONST.IMIUNDO_NAME, "<Control>Z")
-        self.load_accels(agr, builder, CONST.IMIREDO_NAME, "<Control>Y")
-        self.load_accels(agr, builder, CONST.IMICUT_NAME, "<Control>X")
-        self.load_accels(agr, builder, CONST.IMICOPY_NAME, "<Control>C")
-        self.load_accels(agr, builder, CONST.IMIPASTE_NAME, "<Control>V")
-        self.load_accels(agr, builder, CONST.IMISELECTALL_NAME, "<Control>A")
-        self.load_accels(agr, builder, CONST.IMIFIND_NAME, "<Control>F")
-        self.load_accels(agr, builder, CONST.IMIREPLACE_NAME, "<Control>H")
         # connect handlers
         self.handlers = Handlers(builder)
+        window.add_accel_group(self.handlers.get_AccelGroup())
         builder.connect_signals(self.handlers)
 
         # Show the window
@@ -71,11 +57,6 @@ class gtkhex:
 
     def loadFile(self, filename):
         self.handlers.open_file(filename)
-
-    def load_accels(self, agr, builder, name, shortcut):
-        key, mod = gtk.accelerator_parse(shortcut)
-        builder.get_object(name).add_accelerator("activate", agr, key, 
-            mod, gtk.ACCEL_VISIBLE)
 
     def main(self):
         gtk.gdk.threads_enter()

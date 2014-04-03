@@ -51,6 +51,6 @@ class DropTextView(gtk.TextView):
             self.emit("drop-file", p)
 
     def iter_on_screen(self, iter, mark_str):
-        buffer = self.tv.get_buffer()
+        buffer = self.get_buffer()
         buffer.place_cursor(iter) 
         self.scroll_mark_onscreen(buffer.get_mark(mark_str))
