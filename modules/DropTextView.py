@@ -33,10 +33,19 @@ class DropTextView(gtk.TextView):
     def connect_drop(self, widget):
         widget.drag_dest_set(gtk.DEST_DEFAULT_ALL, 
                            [('text/uri-list', 0, 0)], gtk.gdk.ACTION_COPY)
-        widget.connect('drag-data-received', self.on_drop)
-        
+        widget.connect('drag-data-received', self.on_drop_data)
+        widget.connect('drag_motion', self.motion_cb)
+        widget.connect('drag_drop', self.drop_cb)
+   
+    def motion_cb(self, wid, context, x, y, time):
+        context.drag_status(gtk.gdk.ACTION_COPY, time)
+        return True
+   
+    def drop_cb(self, wid, context, x, y, time):
+        context.finish(True, False, time)
+        return True
 
-    def on_drop(self, widget, drag_context, x, y, selection_data, info, timestamp):
+    def on_drop_data(self, widget, drag_context, x, y, selection_data, info, timestamp):
         for uri in selection_data.get_uris():
             p = urlparse.urlparse(uri).path
             self.emit("drop-file", p)

@@ -25,6 +25,13 @@ class ScrolledTextView(gtk.ScrolledWindow):
         self.tv = DropTextView(statusbar)
         self.add_with_viewport(self.tv)
         self.show_all()
+        self.user_ptr = None
 
     def get_textview(self):
         return self.tv
+
+    def set_user_ptr(self, user_ptr):
+        self.user_ptr = user_ptr
+
+    def get_user_ptr(self):
+        return self.user_ptr

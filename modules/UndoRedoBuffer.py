@@ -42,6 +42,11 @@ class UndoRedoBuffer(gtk.TextBuffer):
         self.user_action = False
         self.user_ptr = None
 
+    def get_undo_size(self):
+        return self.undopool.qsize()
+    def get_redo_size(self):
+        return self.redopool.qsize()
+
     def get_user_ptr(self):
         return self.user_ptr
     def set_user_ptr(self, user_ptr):
