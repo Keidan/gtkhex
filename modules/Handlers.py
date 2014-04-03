@@ -34,16 +34,14 @@ class Handlers:
         self.ereplacefind = builder.get_object(CONST.REPLACEFINDENTRY_NAME)
         self.defaultWindowTitle = self.win.get_title()
         self.buffer = None
+        self.changed = False
         # some inits
         self.nb.connect("switch-page", self.on_notebook_page_selected)
         self.add_new_tab_text(File())
         # init sensitive
-        self.set_sensitive(CONST.IMIUNDO_NAME, False)
-        self.set_sensitive(CONST.IMIREDO_NAME, False)
-        self.set_sensitive(CONST.TBUNDO_NAME, False)
-        self.set_sensitive(CONST.TBREDO_NAME, False)
-        self.accelGroup = None
+        self.undo_redo_state()
         # init accels
+        self.accelGroup = None
         self.load_accels(self.builder, CONST.IMIOPEN_NAME, "<Control>O")
         self.load_accels(self.builder, CONST.IMINEW_NAME, "<Control>N")
         self.load_accels(self.builder, CONST.IMISAVE_NAME, "<Control>S")
@@ -71,7 +69,7 @@ class Handlers:
         self.on_appwindow_delete_event(None)
 
     def on_appwindow_delete_event(self, *args):
-        if self.buffer != None and self.buffer.is_changed():
+        if self.buffer != None and self.changed:
             text = "Do you really want to leave this program without save ?"
             if gtk_confirm_box(text):
                 gtk.main_quit()
@@ -85,7 +83,7 @@ class Handlers:
         self.open_file(path)
 
     def on_new(self, button):
-        if self.buffer != None and self.buffer.get_user_ptr() != None and self.buffer.get_user_ptr().get_filename() != None and self.buffer.is_changed():
+        if self.buffer != None and self.buffer.get_user_ptr() != None and self.buffer.get_user_ptr().get_filename() != None and self.changed:
             if not gtk_confirm_box("Do you want to create a new file without saving your changes?"):
                 return
         self.add_new_tab_text(File())
@@ -105,6 +103,7 @@ class Handlers:
         tv.set_sensitive(False)
         self.buffer.set_text(data_to_hex(f.get_data()))
         tv.set_sensitive(True)
+        self.changed = False
 
     def test_data_buffer(self):
         if self.buffer == None: return None
@@ -114,7 +113,7 @@ class Handlers:
                                   gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT, 
                                   gtk.MESSAGE_ERROR, 
                                   gtk.BUTTONS_OK, None)
-            d.set_markup("The text entry contain one or more invalid characters.")
+            d.set_markup("The text entry contain one or more invalid characters.\nOr an Odd-length.")
             d.run()
             d.destroy()
             return None
@@ -127,6 +126,14 @@ class Handlers:
         else: 
             self.buffer.get_user_ptr().set_data(data)
             self.buffer.get_user_ptr().write()
+            self.check_tab_title()
+
+    def check_tab_title(self):
+        if self.buffer == None: return
+        tablabel = self.nb.get_nth_page(self.nb.get_current_page()).get_user_ptr()
+        if tablabel.get_tab_text().endswith(" *"):
+            tablabel.set_tab_text(tablabel.get_tab_text()[:-2])
+            self.changed = False
 
     def on_save_as(self, button):
         if self.buffer == None: return
@@ -138,7 +145,8 @@ class Handlers:
             f.set_data(data)
             self.buffer.set_user_ptr(f)
             # generic call
-            f.write()
+            f.write() 
+            self.check_tab_title()       
 
     def on_cut(self, button):
         if self.buffer == None: return
@@ -162,7 +170,12 @@ class Handlers:
 
     # undo/redo 
     def undo_redo_state(self):
-        if self.buffer == None: return
+        if self.buffer == None: 
+            self.set_sensitive(CONST.IMIUNDO_NAME, False)
+            self.set_sensitive(CONST.TBUNDO_NAME, False)
+            self.set_sensitive(CONST.IMIREDO_NAME, False)
+            self.set_sensitive(CONST.TBREDO_NAME, False)
+            return
         if not self.buffer.get_undo_size():
             self.set_sensitive(CONST.IMIUNDO_NAME, False)
             self.set_sensitive(CONST.TBUNDO_NAME, False)
@@ -178,6 +191,11 @@ class Handlers:
 
     def buffer_update(self, buffer):
         self.undo_redo_state()
+        if len(self.buffer.get_full_text()): 
+            self.changed = True
+            tablabel = self.nb.get_nth_page(self.nb.get_current_page()).get_user_ptr()
+            if not tablabel.get_tab_text().endswith(" *"):
+                tablabel.set_tab_text(tablabel.get_tab_text() + " *")
 
     def on_undo(self, button):
         if self.buffer == None: return
@@ -229,8 +247,12 @@ class Handlers:
         tab_label.connect("close-clicked", self.on_close_clicked, self.nb, stv)
         self.nb.append_page(stv, tab_label)
         self.buffer = stv.get_textview().get_buffer()
+        stv.get_textview().grab_focus()
 
-    def on_close_clicked(self, tab_label, notebook, tab_widget):
+    def on_close_clicked(self, tab_label, notebook, tab_widget): 
+        if self.changed:
+            if not gtk_confirm_box("Do you want to close this tab without saving your changes?"):
+                return
         self.buffer = None
         notebook.remove_page(notebook.page_num(tab_widget))
         if not notebook.get_n_pages():
@@ -238,3 +260,4 @@ class Handlers:
 
     def on_notebook_page_selected(self, notebook, page, pagenum):
         self.buffer = notebook.get_nth_page(pagenum).get_textview().get_buffer()
+        notebook.get_nth_page(pagenum).get_textview().grab_focus()

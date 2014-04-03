@@ -63,6 +63,9 @@ class TabLabel(gtk.Box):
     def set_tab_text(self, label_text):
         self.label.set_text(label_text)
 
+    def get_tab_text(self):
+        return self.label.get_text()
+
     def button_clicked(self, button, data=None):
         self.emit("close-clicked")
 

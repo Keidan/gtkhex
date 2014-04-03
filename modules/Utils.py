@@ -81,5 +81,6 @@ def hex_to_data(content):
     for l in li:
         if l == ' ': continue
         if not is_hex(l): return None
-        result += l.decode('hex')
+        try: result += l.decode('hex')
+        except: return None
     return result
