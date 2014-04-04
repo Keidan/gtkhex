@@ -68,6 +68,8 @@ class _Const(object):
     @constant
     def STATUSBAR_NAME(): return "sb"
     @constant
+    def PROGRESSBAR_NAME(): return "pb"
+    @constant
     def NOTEBOOK_NAME(): return "nbFiles"
     @constant
     def ABOUTDIALOG_NAME(): return "about_dialog"

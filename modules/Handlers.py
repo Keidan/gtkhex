@@ -25,6 +25,7 @@ class Handlers:
         self.builder = builder
         self.win = builder.get_object(CONST.WINDOW_NAME)
         self.sb = builder.get_object(CONST.STATUSBAR_NAME)
+        self.pb = builder.get_object(CONST.PROGRESSBAR_NAME)
         self.nb = builder.get_object(CONST.NOTEBOOK_NAME)
         self.dabout = builder.get_object(CONST.ABOUTDIALOG_NAME)
         self.dfind = builder.get_object(CONST.FINDDIALOG_NAME)
@@ -34,6 +35,7 @@ class Handlers:
         self.ereplacefind = builder.get_object(CONST.REPLACEFINDENTRY_NAME)
         self.defaultWindowTitle = self.win.get_title()
         self.buffer = None
+        self.timer = 0
         self.changed = False
         # some inits
         self.nb.connect("switch-page", self.on_notebook_page_selected)
@@ -64,7 +66,18 @@ class Handlers:
         key, mod = gtk.accelerator_parse(shortcut)
         builder.get_object(name).add_accelerator("activate", self.get_AccelGroup(), key, 
             mod, gtk.ACCEL_VISIBLE)
-
+        
+    def stop_timer(self):
+        if not self.timer: return
+        gobject.source_remove(self.timer)
+        self.timer = 0
+            
+    def progress_timeout(self, me):
+        me.pb.pulse()
+        # As this is a timeout function, return TRUE so that it
+        # continues to get called
+        return True
+        
     def on_quit(self, button):
         self.on_appwindow_delete_event(None)
 
@@ -72,10 +85,12 @@ class Handlers:
         if self.buffer != None and self.changed:
             text = "Do you really want to leave this program without save ?"
             if gtk_confirm_box(text):
+                self.stop_timer()
                 gtk.main_quit()
                 return False
             return True
         else:
+            self.stop_timer()
             gtk.main_quit()
             return False
 
@@ -93,6 +108,9 @@ class Handlers:
         if response: self.open_file(cfile)
 
     def open_file(self, cfile):
+        gtk.gdk.threads_enter()
+        self.stop_timer()
+        self.timer = gobject.timeout_add(100, self.progress_timeout, self)
         f = File(cfile)
         f.read()
         if not self.buffer or len(self.buffer.get_full_text()):
@@ -104,6 +122,8 @@ class Handlers:
         self.buffer.set_text(data_to_hex(f.get_data()))
         tv.set_sensitive(True)
         self.changed = False
+        self.stop_timer()
+        gtk.gdk.threads_leave()
 
     def test_data_buffer(self):
         if self.buffer == None: return None
