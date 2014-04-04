@@ -158,7 +158,7 @@ class Handlers:
 
     def on_paste(self, button):
         if self.buffer == None: return
-        self.buffuer.paste_clipboard (gtk.clipboard_get(), None, True)
+        self.buffer.paste_clipboard (gtk.clipboard_get(), None, True)
 
     def on_delete(self, button):
         if self.buffer == None: return

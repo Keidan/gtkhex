@@ -41,7 +41,7 @@ class gtkhex:
         builder = gtk.Builder()
         builder.add_from_file(gladefile)
         # get objects
-	window = builder.get_object(CONST.WINDOW_NAME)
+        window = builder.get_object(CONST.WINDOW_NAME)
         sb = builder.get_object(CONST.STATUSBAR_NAME)
         nb = builder.get_object(CONST.NOTEBOOK_NAME)
         # init
