@@ -254,7 +254,10 @@ class Handlers:
 
     def set_sensitive(self, name, state):
         widget = self.builder.get_object(name)
-        if not widget.get_sensitive() == state:
+        try:
+            if not widget.get_sensitive() == state:
+                widget.set_sensitive(state)
+        except:
             widget.set_sensitive(state)
 
     def add_new_tab_text(self, cfile):
