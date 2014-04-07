@@ -132,7 +132,7 @@ class UndoRedoBuffer(gtk.TextBuffer):
         self.clear_search()
         self.find_and_select(find, tags, parent)
 
-    def clear_search(self, button):
+    def clear_search(self):
         start = self.get_start_iter()
         end = self.get_end_iter()
         self.remove_all_tags(start, end)
