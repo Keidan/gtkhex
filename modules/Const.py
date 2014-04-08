@@ -52,6 +52,8 @@ class _Const(object):
     @constant
     def IMICOPY_NAME(): return "imiCopy"
     @constant
+    def IMICOPYRAW_NAME(): return "imiCopyRaw"
+    @constant
     def IMIPASTE_NAME(): return "imiPaste"
     @constant
     def IMISELECTALL_NAME(): return "imiSelectAll"

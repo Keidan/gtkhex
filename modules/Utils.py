@@ -86,3 +86,21 @@ def hex_to_data(content):
         try: result += l.decode('hex')
         except: return None
     return result
+
+def copy_from_clipbard(clipboard, buffer):
+    if buffer == None: return
+    content = clipboard.wait_for_text()
+    if content == None: return
+    li = content.split(" ")
+    all_done = False
+    for l in li:
+        l = l.strip()
+        if l == ' ' or not len(l): continue
+        if not is_hex(l):
+            all_done = False
+            break
+        all_done = True
+    if not all_done: content = data_to_hex(content)
+    if not content.endswith(" "): content += " "
+    buffer.insert_at_cursor(content)
+        

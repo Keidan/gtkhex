@@ -22,6 +22,7 @@ from TabLabel import *
 
 class Handlers:
     def __init__(self, builder):
+        self.clipboard = gtk.clipboard_get()
         self.builder = builder
         self.win = builder.get_object(CONST.WINDOW_NAME)
         self.sb = builder.get_object(CONST.STATUSBAR_NAME)
@@ -53,6 +54,7 @@ class Handlers:
         self.load_accels(self.builder, CONST.IMIREDO_NAME, "<Control>Y")
         self.load_accels(self.builder, CONST.IMICUT_NAME, "<Control>X")
         self.load_accels(self.builder, CONST.IMICOPY_NAME, "<Control>C")
+        self.load_accels(self.builder, CONST.IMICOPYRAW_NAME, "<Control>R")
         self.load_accels(self.builder, CONST.IMIPASTE_NAME, "<Control>V")
         self.load_accels(self.builder, CONST.IMISELECTALL_NAME, "<Control>A")
         self.load_accels(self.builder, CONST.IMIFIND_NAME, "<Control>F")
@@ -175,15 +177,30 @@ class Handlers:
 
     def on_cut(self, button):
         if self.buffer == None: return
-        self.buffer.cut_clipboard(gtk.clipboard_get(), True)
+        self.buffer.user_action = True
+        self.buffer.cut_clipboard(self.clipboard, True)
+        self.buffer.user_action = False
+        self.undo_redo_state()
 
     def on_copy(self, button):
         if self.buffer == None: return
-        self.buffer.copy_clipboard (gtk.clipboard_get())
-
+        self.buffer.copy_clipboard (self.clipboard)
+        
+    def on_copy_raw(self, button):
+        if self.buffer == None: return
+        text = hex_to_data(self.buffer.get_selected_text())
+        if text and len(text):
+            self.clipboard.set_text(text)
+            self.clipboard.store()
+        #self.buffer.copy_clipboard (self.clipboard)
+        
     def on_paste(self, button):
         if self.buffer == None: return
-        self.buffer.paste_clipboard (gtk.clipboard_get(), None, True)
+        self.buffer.user_action = True
+        copy_from_clipbard(self.clipboard, self.buffer)
+        self.buffer.user_action = False
+        self.undo_redo_state()
+        # self.buffer.paste_clipboard (slf.clipboard, None, True)
 
     def on_delete(self, button):
         if self.buffer == None: return

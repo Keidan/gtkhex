@@ -171,6 +171,18 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkImageMenuItem" id="imiCopyRaw">
+                        <property name="label" translatable="yes">Copy in raw</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_underline">False</property>
+                        <property name="image">iimicopyraw</property>
+                        <property name="use_stock">False</property>
+			<signal name="activate" handler="on_copy_raw" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkImageMenuItem" id="imiPaste">
                         <property name="label" translatable="yes">_Paste</property>
                         <property name="use_action_appearance">False</property>
@@ -882,6 +894,11 @@
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="stock">gtk-clear</property>
+  </object>
+  <object class="GtkImage" id="iimicopyraw">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-copy</property>
   </object>
   <object class="GtkImage" id="iimicopy">
     <property name="visible">True</property>

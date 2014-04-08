@@ -63,6 +63,13 @@ class UndoRedoBuffer(gtk.TextBuffer):
         match_end = self.get_end_iter() 
         self.select_range(match_start, match_end)
 
+    def get_selected_text(self):
+        iter = self.get_iter_at_mark(self.get_mark("insert"))
+        sel_bound = self.get_iter_at_mark(self.get_mark("selection_bound"))
+        text = ""
+        if not iter == sel_bound:
+            text = self.get_text(iter, sel_bound)
+        return text
 
     def on_cursor_position_changed(self, buffer, param, sb):
         idx = CONST.STATUSBAR_TEXT_IDX
