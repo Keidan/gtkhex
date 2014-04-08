@@ -79,7 +79,8 @@ def hex_to_data(content):
     li = content.split(" ")
     result = ""
     for l in li:
-        if l == ' ': continue
+        l = l.strip()
+        if l == ' ' or l == '\r' or l == '\n' or not len(l): continue
         if not is_hex(l): return None
         try: result += l.decode('hex')
         except: return None
