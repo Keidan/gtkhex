@@ -44,6 +44,7 @@ def gtk_file_chooser(title, action):
     filter = gtk.FileFilter()
     filter.set_name("All Files")
     filter.add_pattern("*.*")
+    filter.add_pattern("*")
     chooser.add_filter(filter)
     response = chooser.run()
     if response == gtk.RESPONSE_OK:
