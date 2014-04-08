@@ -78,6 +78,8 @@ class _Const(object):
     @constant
     def FINDENTRY_NAME(): return "find_entry"
     @constant
+    def FINDALL_NAME(): return "find_all"
+    @constant
     def REPLACEDIALOG_NAME(): return "replace_dialog"
     @constant
     def REPLACEENTRY_NAME(): return "replace_entry"

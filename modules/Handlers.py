@@ -31,6 +31,7 @@ class Handlers:
         self.dfind = builder.get_object(CONST.FINDDIALOG_NAME)
         self.dreplace = builder.get_object(CONST.REPLACEDIALOG_NAME)
         self.efind = builder.get_object(CONST.FINDENTRY_NAME)
+        self.afind = builder.get_object(CONST.FINDALL_NAME)
         self.ereplace = builder.get_object(CONST.REPLACEENTRY_NAME)
         self.ereplacefind = builder.get_object(CONST.REPLACEFINDENTRY_NAME)
         self.defaultWindowTitle = self.win.get_title()
@@ -238,7 +239,7 @@ class Handlers:
         self.dfind.show()
     def on_find_execute(self, button):
         if self.buffer == None: return
-        self.buffer.set_find(self.efind, True, self.dfind)
+        self.buffer.set_find(self.efind, True, self.dfind, self.afind.get_active())
     def on_search_clear(self, button):
         if self.buffer == None: return
         self.buffer.clear_search()

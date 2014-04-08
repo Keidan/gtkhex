@@ -128,14 +128,30 @@ class UndoRedoBuffer(gtk.TextBuffer):
         self.undopool.put(action)
         self.emit("buffer-undo")
 
-    def set_find(self, find, tags, parent):
+    def set_find(self, find, tags, parent, all):
         self.clear_search()
-        self.find_and_select(find, tags, parent)
+        if all:
+            cursor_mark = self.get_insert()
+            start = self.get_iter_at_mark(cursor_mark)
+            if start.get_offset() == self.get_char_count():
+                start = self.get_start_iter()
+            self.search_and_mark(find, start)
+        else:
+            self.find_and_select(find, tags, parent)
 
     def clear_search(self):
         start = self.get_start_iter()
         end = self.get_end_iter()
         self.remove_all_tags(start, end)
+
+    def search_and_mark(self, find, start):
+        text = find.get_text()
+        end = self.get_end_iter()
+        match = start.forward_search(text, 0, end)
+        if match != None:
+            match_start, match_end = match
+            self.apply_tag(self.tag_found, match_start, match_end)
+            self.search_and_mark(find, match_end)
 
     def find_and_select(self, find, tags, parent):
         text = find.get_text()
