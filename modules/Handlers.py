@@ -121,6 +121,7 @@ class Handlers:
         tv = self.nb.get_nth_page(self.nb.get_current_page()).get_textview()
         tv.set_sensitive(False)
         self.buffer.set_text(data_to_hex(f.get_data()))
+        self.buffer.set_user_ptr(f)
         tv.set_sensitive(True)
         self.changed = False
         self.stop_timer()
