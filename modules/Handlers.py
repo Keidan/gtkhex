@@ -156,6 +156,9 @@ class Handlers:
         if tablabel.get_tab_text().endswith(" *"):
             tablabel.set_tab_text(tablabel.get_tab_text()[:-2])
             self.changed = False
+        if not tablabel.get_tab_text() == self.buffer.get_user_ptr().get_simple_name():
+            tablabel.set_tab_text(self.buffer.get_user_ptr().get_simple_name())
+
 
     def on_save_as(self, button):
         if self.buffer == None: return
