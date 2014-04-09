@@ -59,6 +59,7 @@ class Handlers:
         self.load_accels(self.builder, CONST.IMISELECTALL_NAME, "<Control>A")
         self.load_accels(self.builder, CONST.IMIFIND_NAME, "<Control>F")
         self.load_accels(self.builder, CONST.IMIREPLACE_NAME, "<Control>H")
+        self.load_accels(self.builder, CONST.IMIFORMAT_NAME, "<Control>W")
 
     def get_AccelGroup(self):
         if self.accelGroup == None:
@@ -69,6 +70,10 @@ class Handlers:
         key, mod = gtk.accelerator_parse(shortcut)
         builder.get_object(name).add_accelerator("activate", self.get_AccelGroup(), key, 
             mod, gtk.ACCEL_VISIBLE)
+
+    def on_format(self, widget):
+        if not self.buffer: return
+        format_data_buffer(self.buffer)
         
     def stop_timer(self):
         if not self.timer: return

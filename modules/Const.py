@@ -58,6 +58,8 @@ class _Const(object):
     @constant
     def IMISELECTALL_NAME(): return "imiSelectAll"
     @constant
+    def IMIFORMAT_NAME(): return "imiFormat"
+    @constant
     def IMIFIND_NAME(): return "imiFind"
     @constant
     def IMIREPLACE_NAME(): return "imiReplace"

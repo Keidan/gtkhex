@@ -172,11 +172,11 @@
                     </child>
                     <child>
                       <object class="GtkImageMenuItem" id="imiCopyRaw">
-                        <property name="label" translatable="yes">Copy in raw</property>
+                        <property name="label" translatable="yes">Copy in _raw</property>
                         <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="use_underline">False</property>
+                        <property name="use_underline">True</property>
                         <property name="image">iimicopyraw</property>
                         <property name="use_stock">False</property>
 			<signal name="activate" handler="on_copy_raw" swapped="no"/>
@@ -223,6 +223,27 @@
 			<signal name="activate" handler="on_select_all" swapped="no"/>
                       </object>
                     </child>
+
+                    <child>
+                      <object class="GtkSeparatorMenuItem" id="smi5">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="imiFormat">
+                        <property name="label" translatable="yes">_Format</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_underline">True</property>
+                        <property name="image">iimirefresh</property>
+                        <property name="use_stock">False</property>
+			<signal name="activate" handler="on_format" swapped="no"/>
+                      </object>
+                    </child>
+
+
                   </object>
                 </child>
               </object>
@@ -263,7 +284,7 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkSeparatorMenuItem" id="smi5">
+                      <object class="GtkSeparatorMenuItem" id="smi6">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                       </object>
@@ -460,6 +481,33 @@
                 <property name="use_underline">True</property>
                 <property name="icon_widget">itbpaste</property>
 		<signal name="clicked" handler="on_paste" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkSeparatorToolItem" id="tbs3">
+                <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="use_action_appearance">False</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToolButton" id="tbFormat">
+                <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="use_action_appearance">False</property>
+                <property name="use_underline">True</property>
+                <property name="icon_widget">itbrefresh</property>
+		<signal name="clicked" handler="on_format" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -883,6 +931,11 @@
     <property name="can_focus">False</property>
     <property name="stock">gtk-undo</property>
   </object>
+  <object class="GtkImage" id="itbrefresh">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-refresh</property>
+  </object>
 
   <!-- image menu item -->
   <object class="GtkImage" id="iimiabout">
@@ -964,5 +1017,10 @@
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="stock">gtk-undo</property>
+  </object>
+  <object class="GtkImage" id="iimirefresh">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-refresh</property>
   </object>
 </interface>

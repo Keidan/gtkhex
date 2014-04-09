@@ -54,6 +54,28 @@ def gtk_file_chooser(title, action):
     chooser.destroy()
     return False, None
 
+def format_data_buffer(buffer):
+    li = list("".join(buffer.get_full_text().split()))
+    result = ""
+    i = 0
+    line = 0
+    length = len(li)
+    while i < length:
+        result += "{0}".format(li[i])
+        i += 1
+        if i < length:
+            result += "{0}".format(li[i])
+            i += 1
+        result += " "
+        if line == CONST.MAX_CHAR_BY_LINE - 1:
+            line = 0
+            result += "\n"
+        else: line += 1
+        if not line % CONST.MAX_CHAR_BY_SEGMENT and not line == 0: result += " "
+    del li[:]  
+    result.strip()
+    buffer.set_text(result)
+    
 # translate text data to hex representation
 def data_to_hex(content):
     li = list(content)
