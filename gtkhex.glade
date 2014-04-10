@@ -345,6 +345,7 @@
             <property name="can_focus">False</property>
             <child>
               <object class="GtkToolButton" id="tbNew">
+                <property name="tooltip_text" translatable="yes">Create a new file (Ctrl+N)</property>
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -360,6 +361,7 @@
             </child>
             <child>
               <object class="GtkToolButton" id="tbOpen">
+                <property name="tooltip_text" translatable="yes">Open a file (Ctrl+O)</property>
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -375,6 +377,7 @@
             </child>
             <child>
               <object class="GtkToolButton" id="tbSave">
+                <property name="tooltip_text" translatable="yes">Save the current file (Ctrl+S)</property>
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -402,6 +405,7 @@
             </child>
             <child>
               <object class="GtkToolButton" id="tbUndo">
+                <property name="tooltip_text" translatable="yes">Undo action (Ctrl+Z)</property>
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -417,6 +421,7 @@
             </child>
             <child>
               <object class="GtkToolButton" id="tbRedo">
+                <property name="tooltip_text" translatable="yes">Redo action (Ctrl+Y)</property>
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -444,6 +449,7 @@
             </child>
             <child>
               <object class="GtkToolButton" id="tbCut">
+                <property name="tooltip_text" translatable="yes">Cut the selected text (Ctrl+X)</property>
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -459,6 +465,7 @@
             </child>
             <child>
               <object class="GtkToolButton" id="tbCopy">
+                <property name="tooltip_text" translatable="yes">Copy the selected text (Ctrl+C)</property>
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -474,6 +481,7 @@
             </child>
             <child>
               <object class="GtkToolButton" id="tbPaste">
+                <property name="tooltip_text" translatable="yes">Paste a text from the clipboard (Ctrl+V)</property>
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -501,6 +509,7 @@
             </child>
             <child>
               <object class="GtkToolButton" id="tbFormat">
+                <property name="tooltip_text" translatable="yes">Format the text box (Ctrl+W)</property>
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
