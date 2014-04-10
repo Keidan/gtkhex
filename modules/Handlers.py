@@ -61,6 +61,14 @@ class Handlers:
         self.load_accels(self.builder, CONST.IMIREPLACE_NAME, "<Control>H")
         self.load_accels(self.builder, CONST.IMIFORMAT_NAME, "<Control>W")
 
+    def show_hide_window(self, item):
+        if self.win.props.visible:
+            item.set_label("Show")
+            self.win.hide()
+        else:
+            item.set_label("Hide")
+            self.win.show()
+            
     def get_AccelGroup(self):
         if self.accelGroup == None:
             self.accelGroup = gtk.AccelGroup()
