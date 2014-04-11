@@ -38,7 +38,6 @@ class Handlers:
         self.defaultWindowTitle = self.win.get_title()
         self.buffer = None
         self.timer = 0
-        self.changed = False
         # some inits
         self.nb.connect("switch-page", self.on_notebook_page_selected)
         self.add_new_tab_text(File())
@@ -98,7 +97,7 @@ class Handlers:
         self.on_appwindow_delete_event(None)
 
     def on_appwindow_delete_event(self, *args):
-        if self.buffer != None and self.changed:
+        if self.buffer != None and self.buffer.is_changed():
             text = "Do you really want to leave this program without save ?"
             if gtk_confirm_box(text):
                 self.stop_timer()
@@ -114,7 +113,7 @@ class Handlers:
         self.open_file(path)
 
     def on_new(self, button):
-        if self.buffer != None and self.buffer.get_user_ptr() != None and self.buffer.get_user_ptr().get_filename() != None and self.changed:
+        if self.buffer != None and self.buffer.get_user_ptr() != None and self.buffer.get_user_ptr().get_filename() != None and self.buffer.is_changed():
             if not gtk_confirm_box("Do you want to create a new file without saving your changes?"):
                 return
         self.add_new_tab_text(File())
@@ -138,8 +137,9 @@ class Handlers:
         self.buffer.set_text(data_to_hex(f.get_data()))
         self.buffer.set_user_ptr(f)
         tv.set_sensitive(True)
-        self.changed = False
+        self.buffer.set_changed(False)
         self.stop_timer()
+        self.check_tab_title()
         gtk.gdk.threads_leave()
 
     def test_data_buffer(self):
@@ -170,7 +170,7 @@ class Handlers:
         tablabel = self.nb.get_nth_page(self.nb.get_current_page()).get_user_ptr()
         if tablabel.get_tab_text().endswith(" *"):
             tablabel.set_tab_text(tablabel.get_tab_text()[:-2])
-            self.changed = False
+            self.buffer.set_changed(False)
         if not tablabel.get_tab_text() == self.buffer.get_user_ptr().get_simple_name():
             tablabel.set_tab_text(self.buffer.get_user_ptr().get_simple_name())
 
@@ -246,11 +246,9 @@ class Handlers:
 
     def buffer_update(self, buffer):
         self.undo_redo_state()
-        if len(self.buffer.get_full_text()): 
-            self.changed = True
-            tablabel = self.nb.get_nth_page(self.nb.get_current_page()).get_user_ptr()
-            if not tablabel.get_tab_text().endswith(" *"):
-                tablabel.set_tab_text(tablabel.get_tab_text() + " *")
+        tablabel = self.nb.get_nth_page(self.nb.get_current_page()).get_user_ptr()
+        if not tablabel.get_tab_text().endswith(" *"):
+            tablabel.set_tab_text(tablabel.get_tab_text() + " *")
 
     def on_undo(self, button):
         if self.buffer == None: return
@@ -308,7 +306,7 @@ class Handlers:
         stv.get_textview().grab_focus()
 
     def on_close_clicked(self, tab_label, notebook, tab_widget): 
-        if self.changed:
+        if self.buffer and self.buffer.is_changed():
             if not gtk_confirm_box("Do you want to close this tab without saving your changes?"):
                 return
         self.buffer = None

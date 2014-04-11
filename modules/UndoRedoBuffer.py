@@ -32,6 +32,7 @@ class UndoRedoBuffer(gtk.TextBuffer):
         # connect the buff with the status bar
         self.connect("notify::cursor-position", self.on_cursor_position_changed, statusbar)
         # Add undo/redo callbacks
+        self.connect("changed", self.buffer_changed)
         self.connect("insert_text", self.buffer_insert_text)
         self.connect("delete_range", self.buffer_delete_range)
         self.connect("begin_user_action", self.buffer_begin_user_action)
@@ -40,6 +41,13 @@ class UndoRedoBuffer(gtk.TextBuffer):
         self.redopool = LifoQueue(CONST.MAX_REDO)
         self.user_action = False
         self.user_ptr = None
+        self.changed = False
+
+    def set_changed(self, changed):
+        self.changed = changed
+
+    def is_changed(self):
+        return self.changed
 
     def get_undo_size(self):
         return self.undopool.qsize()
@@ -49,6 +57,7 @@ class UndoRedoBuffer(gtk.TextBuffer):
 
     def get_user_ptr(self):
         return self.user_ptr
+        
     def set_user_ptr(self, user_ptr):
         self.user_ptr = user_ptr
 
@@ -87,8 +96,11 @@ class UndoRedoBuffer(gtk.TextBuffer):
         # get the cursor position into the current line
         col = buffer.get_iter_at_line_offset(line, 0)
         sb.push(idx, "Ln {0}, Col: {1}, {2}%".format(line + 1, iter.get_line_offset(), word * 100 / words))
+        
+    def buffer_changed(self, buffer):
+        self.changed = True
         self.emit("buffer-update")
-
+        
     def buffer_insert_text(self, buffer, iter, text, length):
         if self.user_action:
             self.undopool.put(["insert_text", iter.get_offset(), iter.get_offset() + len(text), text])
