@@ -45,7 +45,7 @@ class gtkhex:
         sb = builder.get_object(CONST.STATUSBAR_NAME)
         nb = builder.get_object(CONST.NOTEBOOK_NAME)
         # init
-        sb.push(CONST.STATUSBAR_TEXT_IDX, "Ln 1, Col: 1, 100%")
+        sb.push(CONST.STATUSBAR_TEXT_IDX, "Ln 1, Col: 0, 0%")
         # system tray
         tray = gtk.StatusIcon()
         tray.set_from_stock(gtk.STOCK_EDIT) 
