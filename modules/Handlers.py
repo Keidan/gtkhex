@@ -129,7 +129,6 @@ class Handlers:
         self.timer = gobject.timeout_add(100, self.progress_timeout, self)
         f = File(cfile)
         f.read()
-        print self.nb.get_current_page()
         if not self.buffer or len(self.buffer.get_full_text()):
             self.add_new_tab_text(f)
         else:
@@ -142,6 +141,7 @@ class Handlers:
         self.buffer.set_changed(False)
         self.stop_timer()
         self.check_tab_title()
+        self.update_window_title()
         gtk.gdk.threads_leave()
 
     def test_data_buffer(self):
@@ -308,6 +308,15 @@ class Handlers:
         self.buffer = stv.get_textview().get_buffer()
         stv.get_textview().grab_focus()
         self.nb.set_current_page(self.nb.get_n_pages() - 1)
+        self.update_window_title()
+        
+    def update_window_title(self, num = -1):
+        n = num
+        if n == -1: n = self.nb.get_current_page()
+        tab_label = self.nb.get_nth_page(n).get_user_ptr()
+        if self.title == None: self.title = self.win.get_title()
+        self.win.set_title(self.title + " - " + tab_label.get_tab_text())
+        self.win.queue_draw()
 
     def on_close_clicked(self, tab_label, notebook, tab_widget): 
         if self.buffer and self.buffer.is_changed():
@@ -322,3 +331,4 @@ class Handlers:
         scroll = notebook.get_nth_page(pagenum)
         self.buffer = scroll.get_textview().get_buffer()
         scroll.get_textview().grab_focus()
+        self.update_window_title(pagenum)
