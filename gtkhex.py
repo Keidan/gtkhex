@@ -2,97 +2,88 @@
 
 ###################################################################################
 # @file gtkhex.py
-# @author Keidan
-# @date 27/03/2014
-# @par Project
-# gtkhex
-# @par Copyright
-# Copyright 2014 Keidan, all right reserved
-# This software is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY.
-# 
-# Licence summary : 
-#    You can modify and redistribute the sources code and binaries.
-#    You can send me the bug-fix
-# Term of the licence in in the file licence.txt.
-#
+# @author Keidan (Kevin Billonneau)
+# @par Copyright GNU GENERAL PUBLIC LICENSE Version 3
 ###################################################################################
 
 
-import sys, os, inspect
+import sys, os, inspect, datetime
 
 # get the current folder
-current_folder = os.path.realpath(os.path.abspath(
-        os.path.split(inspect.getfile(
-                inspect.currentframe()))[0]))
-if current_folder not in sys.path:
-    sys.path.insert(0, current_folder)
+current_folder = os.path.realpath(
+    os.path.abspath(os.path.split(inspect.getfile(inspect.currentframe()))[0])
+)
 # include modules from a subforder
-cmd_subfolder = os.path.join(current_folder, "modules")
+cmd_subfolder = os.path.join(current_folder, 'mods')
 if cmd_subfolder not in sys.path:
-    sys.path.insert(0, cmd_subfolder)
+    sys.path.append(cmd_subfolder)
 
-from Handlers import *
+import gi
+
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+from gi.repository import GdkPixbuf
+from consts import CONST
+from handlers import Handlers
+from icon_tray import IconTray
+
+APPLICATION_VERSION = '1.0.1'
 
 class gtkhex:
     def __init__(self):
-        #Set the Glade file
-        gladefile = os.path.join(current_folder, "gtkhex.glade")
-        builder = gtk.Builder()
+        self.icon_path = os.path.join(current_folder, 'icon.png')
+        # Set the Glade file
+        gladefile = os.path.join(current_folder, 'gtkhex.glade')
+        builder = Gtk.Builder()
         builder.add_from_file(gladefile)
         # get objects
-        window = builder.get_object(CONST.WINDOW_NAME)
-        sb = builder.get_object(CONST.STATUSBAR_NAME)
-        nb = builder.get_object(CONST.NOTEBOOK_NAME)
+        window = builder.get_object(CONST.window_name())
+        window.set_icon_from_file(self.icon_path)
+        sb = builder.get_object(CONST.statusbar_name())
         # init
-        sb.push(CONST.STATUSBAR_TEXT_IDX, "Ln 1, Col: 0, 0%")
+        sb.push(CONST.statusbar_text_idx(), 'Ln 1, Col: 0, 0%')
         # system tray
-        tray = gtk.StatusIcon()
-        tray.set_from_stock(gtk.STOCK_EDIT) 
-        tray.connect('popup-menu', self.on_right_click)
-        tray.set_tooltip((window.get_title()))
+        tray = IconTray(window.get_title(), 'document-edit')
+        tray.add_menu_item(lambda x: self.handlers.show_hide_window(x), 'Hide')
+        tray.add_menu_item(lambda x: self.handlers.on_about(x), 'About')
+        tray.add_seperator()
+        tray.add_menu_item(lambda x: self.handlers.on_quit(x), 'Quit')
+
         # connect handlers
         self.handlers = Handlers(builder)
-        window.add_accel_group(self.handlers.get_AccelGroup())
+        window.add_accel_group(self.handlers.get_accel_group())
         builder.connect_signals(self.handlers)
+        self.install_about_info()
 
         # Show the window
         window.show_all()
 
-    def on_right_click(self, icon, event_button, event_time):
-		self.make_menu(event_button, event_time)
-
-    def make_menu(self, event_button, event_time):
-        menu = gtk.Menu()
-        # show/hide window
-        showhide = gtk.MenuItem("Hide")
-        showhide.show()
-        menu.append(showhide)
-        showhide.connect('activate', self.handlers.show_hide_window)
-        # show about dialog
-        about = gtk.MenuItem("About")
-        about.show()
-        menu.append(about)
-        about.connect('activate', self.Handlers.on_about)
-        # add quit item
-        quit = gtk.MenuItem("Quit")
-        quit.show()
-        menu.append(quit)
-        quit.connect('activate', self.handlers.on_quit)
-        menu.popup(None, None, gtk.status_icon_position_menu,
-                   event_button, event_time, self.tray)
-
-    def loadFile(self, filename):
+    def load_file(self, filename):
         self.handlers.open_file(filename)
 
     def main(self):
-        gtk.gdk.threads_enter()
-        gtk.main()
-        gtk.gdk.threads_leave()
+        Gtk.main()
+
+    def install_about_info(self):
+        today = datetime.date.today()
+        about = self.handlers.get_dialog_about()
+        about.set_copyright(f'Copyright © 2014 - {today.year}')
+        about.set_comments('GtkHex is a simple hexadecimal editor.')
+        about.set_website_label('GitHub')
+        about.set_website('https://github.com/Keidan/gtkhex')
+        about.set_license(
+            'This program is provided without warranty of any kind.\nFor more information, visit GNU General Public License, version 3 or later.\nhttps://www.gnu.org/licenses/gpl-3.0.html'
+        )
+        about.set_authors(['Keidan'])
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size(self.icon_path, 48, 48)
+        about.set_logo(pixbuf)
+        about.set_version(APPLICATION_VERSION)
+
 
 def main(argv):
     win = gtkhex()
-    if len(sys.argv) == 2: win.loadFile(argv[0])
+    if len(sys.argv) == 2:
+        win.load_file(argv[0])
     win.main()
 
 

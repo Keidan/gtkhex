@@ -1,20 +1,9 @@
 ###################################################################################
-# @file File.py
-# @author Keidan
-# @date 01/04/2014
-# @par Project
-# gtkhex
-# @par Copyright
-# Copyright 2014 Keidan, all right reserved
-# This software is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY.
-# 
-# Licence summary : 
-#    You can modify and redistribute the sources code and binaries.
-#    You can send me the bug-fix
-# Term of the licence in in the file licence.txt.
-#
+# @file file.py
+# @author Keidan (Kevin Billonneau)
+# @par Copyright GNU GENERAL PUBLIC LICENSE Version 3
 ###################################################################################
+
 
 class File:
     def __init__(self, filename=None):
@@ -35,16 +24,16 @@ class File:
 
     def get_simple_name(self):
         if not self.filename:
-            return "Untitled"
-        index = self.filename.replace("\\","/").rfind("/") + 1
+            return 'Untitled'
+        index = self.filename.replace('\\', '/').rfind('/') + 1
         return self.filename[index:]
 
     def read(self):
-        file = open(self.filename, "r")
+        file = open(self.filename, 'rb')
         self.data = file.read()
         file.close()
 
     def write(self):
-        file = open(self.filename, "w+")
+        file = open(self.filename, 'wb+')
         file.write(self.data)
         file.close()
